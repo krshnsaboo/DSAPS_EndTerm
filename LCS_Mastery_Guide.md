@@ -1,0 +1,514 @@
+# Mastering Longest Common Subsequence (LCS): The Complete Algorithmic & Reasoning Guide
+
+> **Target Audience:** Students preparing for rigorous dynamic programming and algorithmic exams (e.g., IIIT-H DSAPS, GATE, technical interviews).  
+> **Prerequisites:** None assumed! Built from scratch with intuitive definitions, formal prefix proofs, Hirschberg's linear-space algorithm, C++ code, and classic reduction relationships.
+
+---
+
+## Table of Contents
+1. [The Big Picture: Subsequence vs Substring](#1-the-big-picture-subsequence-vs-substring)
+   - [Crucial Distinction](#crucial-distinction)
+   - [Formal Problem Statement](#formal-problem-statement)
+2. [Optimal Substructure & Recurrence Relation](#2-optimal-substructure--recurrence-relation)
+   - [The Three Cases (Prefix Property)](#the-three-cases-prefix-property)
+   - [Formal Proof of the Recurrence via Cut-and-Paste](#formal-proof-of-the-recurrence-via-cut-and-paste)
+3. [The Standard DP Table & Backtracking Reconstruction](#3-the-standard-dp-table--backtracking-reconstruction)
+   - [Table Filling Mechanics ($O(m \cdot n)$ Time and Space)](#table-filling-mechanics-om-cdot-n-time-and-space)
+   - [Reconstructing the LCS String](#reconstructing-the-lcs-string)
+   - [Can There Be Multiple LCS Strings?](#can-there-be-multiple-lcs-strings)
+4. [Space Optimizations: From $O(m \cdot n)$ to $O(m + n)$](#4-space-optimizations-from-om-cdot-n-to-om--n)
+   - [Two-Row / 1D Rolling Array for Length ($O(\min(m, n))$ Space)](#two-row--1d-rolling-array-for-length-ominm-n-space)
+   - [Hirschberg’s Algorithm: Full String Reconstruction in $O(m + n)$ Space](#hirschbergs-algorithm-full-string-reconstruction-in-om--n-space)
+5. [The Great Web of Reductions (Exam Goldmine)](#5-the-great-web-of-reductions-exam-goldmine)
+   - [Shortest Common Supersequence (SCS)](#shortest-common-supersequence-scs)
+   - [Minimum Edit Distance (Insertions & Deletions Only)](#minimum-edit-distance-insertions--deletions-only)
+   - [Longest Palindromic Subsequence (LPS)](#longest-palindromic-subsequence-lps)
+   - [Longest Increasing Subsequence (LIS)](#longest-increasing-subsequence-lis)
+6. [Complete Production-Grade C++ Implementation](#6-complete-production-grade-c-implementation)
+7. [Advanced Exam Variations & Twisted Scenarios](#7-advanced-exam-variations--twisted-scenarios)
+   - [Variation 1: LCS of $k$ Strings (Is It Polynomial?)](#variation-1-lcs-of-k-strings-is-it-polynomial)
+   - [Variation 2: When Does Greedy Work for LCS?](#variation-2-when-does-greedy-work-for-lcs)
+   - [Variation 3: Counting the Total Number of Distinct LCS Strings](#variation-3-counting-the-total-number-of-distinct-lcs-strings)
+8. [Curated Medium-to-Hard Problems (LeetCode & Codeforces)](#8-curated-medium-to-hard-problems-leetcode--codeforces)
+   - [Problem 1: Shortest Common Supersequence (LeetCode 1092 - Hard)](#problem-1-shortest-common-supersequence-leetcode-1092---hard)
+   - [Problem 2: Distinct Subsequences Counting (LeetCode 115 - Hard)](#problem-2-distinct-subsequences-counting-leetcode-115---hard)
+   - [Problem 3: Catching Cheaters (Codeforces 1446B - Medium-Hard)](#problem-3-catching-cheaters-codeforces-1446b---medium-hard)
+   - [Problem 4: Levenshtein Edit Distance (LeetCode 72 - Medium-Hard)](#problem-4-levenshtein-edit-distance-leetcode-72---medium-hard)
+9. [Exam Day Summary Checklist](#9-exam-day-summary-checklist)
+
+---
+
+## 1. The Big Picture: Subsequence vs Substring
+
+### Crucial Distinction
+Given a string $S = \text{"ABCDEFG"}$:
+- A **substring** must be strictly **contiguous**:  
+  $\text{"BCD"}$ and $\text{"EF"}$ are substrings. $\text{"ACD"}$ is **NOT** a substring.
+- A **subsequence** is obtained by deleting zero or more characters **without changing the relative order** of the remaining characters (it does **not** need to be contiguous):  
+  $\text{"ACD"}$, $\text{"BDF"}$, and $\text{"AG"}$ are valid subsequences!
+
+### Formal Problem Statement
+Given two sequences:
+- $X = \langle x_1, x_2, \dots, x_m \rangle$
+- $Y = \langle y_1, y_2, \dots, y_n \rangle$
+
+Find the maximum length of a sequence $Z = \langle z_1, z_2, \dots, z_k \rangle$ that is a subsequence of both $X$ and $Y$.
+
+---
+
+## 2. Optimal Substructure & Recurrence Relation
+
+Let $X_i = \langle x_1, \dots, x_i \rangle$ be the $i$-th prefix of $X$, and $Y_j = \langle y_1, \dots, y_j \rangle$ be the $j$-th prefix of $Y$.  
+Let $dp[i][j]$ be the length of the LCS of $X_i$ and $Y_j$.
+
+### The Three Cases (Prefix Property)
+1. **Case 1 (Character Match):** If $x_i == y_j$:  
+   The matching character **must be part of the optimal solution for this subproblem**:
+   $$dp[i][j] = dp[i-1][j-1] + 1$$
+2. **Case 2 (Character Mismatch):** If $x_i \ne y_j$:  
+   The last characters cannot both be part of the same LCS. Therefore, either $x_i$ is discarded, or $y_j$ is discarded (or both):
+   $$dp[i][j] = \max\Big(dp[i-1][j], \ dp[i][j-1]\Big)$$
+
+#### Base Cases:
+$$dp[i][0] = 0 \quad \forall i, \qquad dp[0][j] = 0 \quad \forall j$$
+
+---
+
+### Formal Proof of the Recurrence via Cut-and-Paste
+
+#### Proof for Case 1 ($x_i == y_j$):
+Let $Z = \langle z_1, \dots, z_k \rangle$ be an LCS of $X_i$ and $Y_j$.
+- **Claim:** $z_k = x_i = y_j$.
+- *Proof:* If $z_k \ne x_i$, we could append $x_i$ to $Z$, creating a common subsequence of length $k + 1$, contradicting that $Z$ was the longest common subsequence!
+- Now, consider the prefix $Z_{k-1} = \langle z_1, \dots, z_{k-1} \rangle$.
+- $Z_{k-1}$ is clearly a common subsequence of $X_{i-1}$ and $Y_{j-1}$ of length $k - 1$.
+- Is $Z_{k-1}$ an LCS of $X_{i-1}$ and $Y_{j-1}$?
+  - Suppose for contradiction that there existed a longer common subsequence $W$ of $X_{i-1}$ and $Y_{j-1}$ with $|W| \ge k$.
+  - Appending $x_i$ to $W$ would yield a common subsequence of $X_i$ and $Y_j$ of length $\ge k + 1$, contradicting that $|Z| = k$ was maximal.
+- Thus, $|Z_{k-1}| = dp[i-1][j-1] \implies dp[i][j] = dp[i-1][j-1] + 1$. $\blacksquare$
+
+---
+
+## 3. The Standard DP Table & Backtracking Reconstruction
+
+### Table Filling Mechanics ($O(m \cdot n)$ Time and Space)
+Let $X = \text{"LONGEST"}$ ($m = 7$) and $Y = \text{"STONE"}$ ($n = 5$):
+
+```
+       Ø   S   T   O   N   E
+   Ø   0   0   0   0   0   0
+   L   0   0   0   0   0   0
+   O   0   0   0   1   1   1
+   N   0   0   0   1   2   2
+   G   0   0   0   1   2   2
+   E   0   0   0   1   2   3
+   S   0   1   1   1   2   3
+   T   0   1   2   2   2   3
+```
+Length of LCS $= dp[7][5] = 3$ ($\text{"ONE"}$).
+
+---
+
+### Reconstructing the LCS String
+Start at cell $(m, n)$ and backtrack to $(0, 0)$:
+1. If $X[i-1] == Y[j-1]$, this character was matched! Prepend it to the result and move diagonally: $(i-1, j-1)$.
+2. If $X[i-1] \ne Y[j-1]$:
+   - If $dp[i-1][j] \ge dp[i][j-1]$, move **UP** to $(i-1, j)$.
+   - Else, move **LEFT** to $(i, j-1)$.
+3. Stop when $i = 0$ or $j = 0$.
+
+### Can There Be Multiple LCS Strings?
+**YES!** When $dp[i-1][j] == dp[i][j-1]$, branching both UP and LEFT yields different valid LCS strings.  
+*Example:* $X = \text{"AB"}, Y = \text{"BA"}$. LCS length is 1, and both $\text{"A"}$ and $\text{"B"}$ are valid LCS strings!
+
+---
+
+## 4. Space Optimizations: From $O(m \cdot n)$ to $O(m + n)$
+
+### Two-Row / 1D Rolling Array for Length ($O(\min(m, n))$ Space)
+Notice that computing row $i$ requires **only row $i-1$**.  
+We can maintain two rows (`prev` and `curr`), reducing space to $O(\min(m, n))$.
+
+---
+
+### Hirschberg’s Algorithm: Full String Reconstruction in $O(m + n)$ Space
+How can we reconstruct the **entire string** in $O(m + n)$ space while keeping running time $O(m \cdot n)$?  
+**Hirschberg's Algorithm** (1975) combines Dynamic Programming with **Divide and Conquer**:
+
+1. **Split $X$ in half:** Let $mid = \lfloor m/2 \rfloor$.
+2. **Compute forward DP:** Run space-optimized DP on $X[1..mid]$ and $Y[1..n]$ to get the LCS lengths from the top.
+3. **Compute backward DP:** Run space-optimized DP on the reversed strings of $X[mid+1..m]$ and $Y[1..n]$ to get the LCS lengths from the bottom.
+4. **Find the Optimal Split Point $k^*$ in $Y$:**
+   $$k^* = \arg\max_{0 \le k \le n} \Big(dp_{\text{forward}}[k] + dp_{\text{backward}}[n - k]\Big)$$
+   This tells us: the optimal LCS passes through the character pair $(X[mid], Y[k^*])$!
+5. **Recurse:**
+   - Left subproblem: $X[1..mid]$ with $Y[1..k^*]$
+   - Right subproblem: $X[mid+1..m]$ with $Y[k^*+1..n]$
+6. **Total Time:**
+   $$T(m, n) = O(mn) + T(m/2, k^*) + T(m/2, n - k^*) = O(mn) + O(mn/2) + O(mn/4) \dots = \mathbf{O(mn)}$$
+7. **Total Space:** Only storing DP rows $\implies \mathbf{O(m + n)}$!
+
+---
+
+## 5. The Great Web of Reductions (Exam Goldmine)
+
+Professors love testing your ability to reduce other problems to LCS!
+
+---
+
+### Shortest Common Supersequence (SCS)
+A **supersequence** of $X$ and $Y$ is a string that contains both $X$ and $Y$ as subsequences.
+> **The Golden Formula:**
+> $$|SCS(X, Y)| = |X| + |Y| - |LCS(X, Y)|$$
+
+**Intuition:** Characters present in the LCS can be shared once between $X$ and $Y$. Characters not in the LCS must each appear separately.
+
+---
+
+### Minimum Edit Distance (Insertions & Deletions Only)
+If you can only **insert** and **delete** characters (cost 1 each):
+$$\text{Deletions from } X = |X| - |LCS(X, Y)|$$
+$$\text{Insertions into } X = |Y| - |LCS(X, Y)|$$
+$$\text{Total Minimum Edit Distance} = |X| + |Y| - 2|LCS(X, Y)|$$
+
+---
+
+### Longest Palindromic Subsequence (LPS)
+To find the longest subsequence of string $S$ that reads the same forwards and backwards:
+$$LPS(S) \equiv LCS\Big(S, \ \text{reverse}(S)\Big)$$
+
+---
+
+### Longest Increasing Subsequence (LIS)
+Given an array $A$ of $n$ numbers, let $B$ be a copy of $A$ sorted in strictly increasing order with duplicates removed. Then:
+$$LIS(A) \equiv LCS(A, B)$$
+*(Solves LIS in $O(n^2)$ time; patience sorting can optimize this to $O(n \log n)$).*
+
+---
+
+## 6. Complete Production-Grade C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+
+using namespace std;
+
+// 1. Standard 2D DP with Full Reconstruction
+string findLCS(const string& X, const string& Y) {
+    int m = X.size(), n = Y.size();
+    vector<vector<int>> dp(m + 1, vector<int>(n + 1, 0));
+
+    // Fill table
+    for (int i = 1; i <= m; ++i) {
+        for (int j = 1; j <= n; ++j) {
+            if (X[i - 1] == Y[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1] + 1;
+            } else {
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
+    }
+
+    // Backtrack to reconstruct string
+    string lcs = "";
+    int i = m, j = n;
+    while (i > 0 && j > 0) {
+        if (X[i - 1] == Y[j - 1]) {
+            lcs += X[i - 1];
+            i--; j--;
+        } else if (dp[i - 1][j] >= dp[i][j - 1]) {
+            i--;
+        } else {
+            j--;
+        }
+    }
+    reverse(lcs.begin(), lcs.end());
+    return lcs;
+}
+
+// 2. Space-Optimized LCS Length (O(min(m, n)) space)
+int lcsLengthOptimized(const string& X, const string& Y) {
+    if (X.size() < Y.size()) return lcsLengthOptimized(Y, X);
+    int m = X.size(), n = Y.size();
+
+    vector<int> prev(n + 1, 0), curr(n + 1, 0);
+
+    for (int i = 1; i <= m; ++i) {
+        for (int j = 1; j <= n; ++j) {
+            if (X[i - 1] == Y[j - 1]) {
+                curr[j] = prev[j - 1] + 1;
+            } else {
+                curr[j] = max(prev[j], curr[j - 1]);
+            }
+        }
+        prev = curr;
+    }
+    return prev[n];
+}
+```
+
+---
+
+## 7. Advanced Exam Variations & Twisted Scenarios
+
+### Variation 1: LCS of $k$ Strings (Is It Polynomial?)
+- For $k = 3$ strings of length $n$: $dp[i][j][k]$ runs in $O(n^3)$ time, which is polynomial.
+- For **arbitrary $k$** (where $k$ is part of the input): **LCS is NP-Hard!**
+
+### Variation 2: When Does Greedy Work for LCS?
+- If all characters in string $X$ are **distinct**, every character in $Y$ that appears in $X$ can be mapped to its unique index in $X$.
+- The problem then reduces to finding the **Longest Increasing Subsequence (LIS)** of indices, solvable in **$O(n \log n)$** time using binary search!
+
+---
+
+## 8. Curated Medium-to-Hard Problems (LeetCode & Codeforces)
+
+Mastering LCS requires excelling at supersequence interleaving, distinct subsequence counting, and substring-penalized DP variants.
+
+---
+
+### Problem 1: Shortest Common Supersequence (LeetCode 1092 - Hard)
+
+#### Problem Statement:
+Given two strings `str1` and `str2`, return the **shortest string** that has both `str1` and `str2` as subsequences. If there are multiple valid answers, you may return any of them.
+
+#### Deep Algorithmic Intuition:
+1. First, compute the standard 2D LCS table between `str1` ($m$) and `str2` ($n$).
+2. The length of the SCS is $|str1| + |str2| - |LCS|$.
+3. **Reconstruction Strategy:** We backtrack from $(m, n)$ to $(0, 0)$:
+   - If `str1[i-1] == str2[j-1]`, this character is in the LCS! We add it **once** to our result and move diagonally $(i-1, j-1)$.
+   - If `str1[i-1] != str2[j-1]`:
+     - If $dp[i-1][j] > dp[i][j-1]$, moving UP was optimal. This means character `str1[i-1]` was NOT part of the LCS. We **must still include it in the supersequence**! Add `str1[i-1]` and move UP $(i-1, j)$.
+     - Else, moving LEFT was optimal. Character `str2[j-1]` was not part of the LCS. Add `str2[j-1]` and move LEFT $(i, j-1)$.
+4. Append any remaining characters from whichever string has not reached index $0$, and reverse the result.
+
+#### C++ Solution:
+
+```cpp
+#include <string>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+class Solution1092 {
+public:
+    string shortestCommonSupersequence(string str1, string str2) {
+        int m = str1.size(), n = str2.size();
+        vector<vector<int>> dp(m + 1, vector<int>(n + 1, 0));
+
+        // Step 1: Compute LCS table
+        for (int i = 1; i <= m; ++i) {
+            for (int j = 1; j <= n; ++j) {
+                if (str1[i - 1] == str2[j - 1]) {
+                    dp[i][j] = dp[i - 1][j - 1] + 1;
+                } else {
+                    dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
+                }
+            }
+        }
+
+        // Step 2: Backtrack and reconstruct SCS
+        string scs = "";
+        int i = m, j = n;
+        while (i > 0 && j > 0) {
+            if (str1[i - 1] == str2[j - 1]) {
+                scs += str1[i - 1]; // Common character included once
+                i--; j--;
+            } else if (dp[i - 1][j] > dp[i][j - 1]) {
+                scs += str1[i - 1]; // str1 char not in LCS, must still be included
+                i--;
+            } else {
+                scs += str2[j - 1]; // str2 char not in LCS, must still be included
+                j--;
+            }
+        }
+
+        // Add remaining characters
+        while (i > 0) scs += str1[--i];
+        while (j > 0) scs += str2[--j];
+
+        reverse(scs.begin(), scs.end());
+        return scs;
+    }
+};
+```
+
+---
+
+### Problem 2: Distinct Subsequences Counting (LeetCode 115 - Hard)
+
+#### Problem Statement:
+Given two strings `s` and `t`, return the **number of distinct subsequences** of `s` which equals `t`.
+
+#### Algorithmic Formulation:
+Let $dp[i][j]$ be the number of distinct subsequences of $s[0..i-1]$ that equal $t[0..j-1]$.
+- **Base Case:** $dp[i][0] = 1$ for all $i$ (an empty target $t$ can always be formed in exactly 1 way: by deleting all characters).
+- **Recurrence:**
+  - If $s[i-1] == t[j-1]$: We can either match $s[i-1]$ with $t[j-1]$, or skip $s[i-1]$:
+    $$dp[i][j] = dp[i-1][j-1] + dp[i-1][j]$$
+  - If $s[i-1] \ne t[j-1]$: We cannot match, so we must skip $s[i-1]$:
+    $$dp[i][j] = dp[i-1][j]$$
+
+#### Space-Optimized 1D C++ Solution:
+
+```cpp
+#include <string>
+#include <vector>
+
+using namespace std;
+
+class Solution115 {
+public:
+    int numDistinct(string s, string t) {
+        int m = s.size(), n = t.size();
+        // Use unsigned long long to handle intermediate large counts
+        vector<unsigned long long> dp(n + 1, 0);
+        dp[0] = 1; // Empty string t is matched by 1 empty subsequence
+
+        for (int i = 1; i <= m; ++i) {
+            // Loop backwards to use previous row values
+            for (int j = n; j >= 1; --j) {
+                if (s[i - 1] == t[j - 1]) {
+                    dp[j] += dp[j - 1];
+                }
+            }
+        }
+
+        return (int)dp[n];
+    }
+};
+```
+
+---
+
+### Problem 3: Catching Cheaters (Codeforces 1446B - Medium-Hard)
+
+#### Problem Statement:
+You are given two strings $A$ and $B$ of lengths $n$ and $m$ ($n, m \le 5000$).  
+Choose a contiguous non-empty substring $A'$ of $A$ and a contiguous non-empty substring $B'$ of $B$ to maximize the score:
+$$\text{Score}(A', B') = 4 \cdot LCS(A', B') - |A'| - |B'|$$
+Find the maximum possible score (or $0$ if all scores are negative).
+
+#### Algorithmic Insights (Kadane's Reset + LCS):
+Notice the scoring formula:
+- Matching character pair: adds $4$ to $4 \cdot LCS$, but adds $1$ to $|A'|$ and $1$ to $|B'|$. Net gain: $+4 - 1 - 1 = \mathbf{+2}$.
+- Extending $A'$ with a mismatch: penalty $-1$.
+- Extending $B'$ with a mismatch: penalty $-1$.
+- Because $A'$ and $B'$ can start **anywhere** (they are substrings), if our score drops below $0$, we can discard the previous prefix and start fresh at $0$! **(Kadane's Algorithm principle)**.
+
+#### Recurrence:
+$$dp[i][j] = \max\begin{cases}
+0 \\
+dp[i-1][j-1] + 2 & \text{if } A[i-1] == B[j-1] \\
+dp[i-1][j] - 1 \\
+dp[i][j-1] - 1
+\end{cases}$$
+
+#### C++ Solution:
+
+```cpp
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int n, m;
+    if (!(cin >> n >> m)) return 0;
+    string A, B;
+    cin >> A >> B;
+
+    vector<vector<int>> dp(n + 1, vector<int>(m + 1, 0));
+    int max_score = 0;
+
+    for (int i = 1; i <= n; ++i) {
+        for (int j = 1; j <= m; ++j) {
+            if (A[i - 1] == B[j - 1]) {
+                dp[i][j] = max(dp[i][j], dp[i - 1][j - 1] + 2);
+            } else {
+                dp[i][j] = max({0, dp[i - 1][j] - 1, dp[i][j - 1] - 1});
+            }
+            max_score = max(max_score, dp[i][j]);
+        }
+    }
+
+    cout << max_score << "\n";
+    return 0;
+}
+```
+
+---
+
+### Problem 4: Levenshtein Edit Distance (LeetCode 72 - Medium-Hard)
+
+#### Problem Statement:
+Given two strings `word1` and `word2`, return the minimum number of operations required to convert `word1` to `word2`.  
+Permitted operations:
+1. **Insert** a character (cost 1)
+2. **Delete** a character (cost 1)
+3. **Replace** a character (cost 1)
+
+#### Recurrence:
+$$dp[i][j] = \begin{cases}
+dp[i-1][j-1] & \text{if } word1[i-1] == word2[j-1] \\
+1 + \min\begin{cases}
+dp[i-1][j] & \text{(Delete)} \\
+dp[i][j-1] & \text{(Insert)} \\
+dp[i-1][j-1] & \text{(Replace)}
+\end{cases} & \text{if } word1[i-1] \ne word2[j-1]
+\end{cases}$$
+
+#### Space-Optimized C++ Solution:
+
+```cpp
+#include <string>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+class Solution72 {
+public:
+    int minDistance(string word1, string word2) {
+        int m = word1.size(), n = word2.size();
+        vector<int> prev(n + 1, 0), curr(n + 1, 0);
+
+        for (int j = 0; j <= n; ++j) prev[j] = j; // Base case: inserting all chars of word2
+
+        for (int i = 1; i <= m; ++i) {
+            curr[0] = i; // Base case: deleting all chars of word1
+            for (int j = 1; j <= n; ++j) {
+                if (word1[i - 1] == word2[j - 1]) {
+                    curr[j] = prev[j - 1];
+                } else {
+                    curr[j] = 1 + min({prev[j], curr[j - 1], prev[j - 1]});
+                }
+            }
+            prev = curr;
+        }
+
+        return prev[n];
+    }
+};
+```
+
+---
+
+## 9. Exam Day Summary Checklist
+
+1. **Subsequence $\ne$ Substring** (Subsequence allows skips).
+2. **$dp[i][j] = dp[i-1][j-1] + 1$ on match; $\max(dp[i-1][j], dp[i][j-1])$ on mismatch.**
+3. **Space:** Length needs only $O(\min(m, n))$ space; string reconstruction needs $O(m + n)$ space via **Hirschberg's Algorithm**.
+4. **Key Reductions:**
+   - $|SCS| = |X| + |Y| - |LCS|$
+   - $LPS(S) = LCS(S, \text{reverse}(S))$
+   - Edit Distance $= |X| + |Y| - 2|LCS|$

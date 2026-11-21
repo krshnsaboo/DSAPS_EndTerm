@@ -1,0 +1,13 @@
+# OS & editor files
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.vscode/
+.idea/
+
+# Binaries and compiled output
+*.o
+*.out
+*.exe
+a.out
