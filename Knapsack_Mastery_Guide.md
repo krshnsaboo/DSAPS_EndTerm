@@ -13,25 +13,28 @@
 2. [The Greedy Dilemma: When Does Greedy Work, and When Does It Fail?](#2-the-greedy-dilemma-when-does-greedy-work-and-when-does-it-fail)
    - [Why Greedy by Value/Weight Ratio Works for Fractional Knapsack](#why-greedy-by-valueweight-ratio-works-for-fractional-knapsack)
    - [Why Greedy by Ratio Fails for 0/1 Knapsack (The Classic Gap Problem)](#why-greedy-by-ratio-fails-for-01-knapsack-the-classic-gap-problem)
-3. [Deep Analysis of the PYQ Knapsack Puzzles (Slip Test 2)](#3-deep-analysis-of-the-pyq-knapsack-puzzles-slip-test-2)
+3. [Deep Analysis of the PYQ Knapsack Puzzles](#3-deep-analysis-of-the-pyq-knapsack-puzzles)
    - [Puzzle 1: Monotonic Weights and Values (Does Greedy Work?)](#puzzle-1-monotonic-weights-and-values-does-greedy-work)
    - [Puzzle 2: All Items Share the Exact Same Value/Weight Ratio](#puzzle-2-all-items-share-the-exact-same-valueweight-ratio)
    - [Puzzle 3: Exponential Values ($v_{i+1} = 2 v_i$)](#puzzle-3-exponential-values-vi1--2-vi)
-4. [Dynamic Programming Formulations & Optimizations](#4-dynamic-programming-formulations--optimizations)
+4. [Slip Test 3 Deep Dive: The Two Thieves / Multiple Knapsack Problem](#4-slip-test-3-deep-dive-the-two-thieves--multiple-knapsack-problem)
+   - [Puzzle 1: Two Thieves ($W_1 = 15, W_2 = 17$, 7 Items)](#puzzle-1-two-thieves-w_1--15-w_2--17-7-items)
+   - [Puzzle 2: General Two-Knapsack Algorithm & Complexity](#puzzle-2-general-two-knapsack-algorithm--complexity)
+5. [Dynamic Programming Formulations & Optimizations](#5-dynamic-programming-formulations--optimizations)
    - [Standard DP: Weight as State ($O(n \cdot W)$)](#standard-dp-weight-as-state-on-cdot-w)
    - [1D Array Space Optimization (Why Reverse Traversal is Mandatory)](#1d-array-space-optimization-why-reverse-traversal-is-mandatory)
    - [Dual DP: Value as State ($O(n \cdot V_{\max})$ for Huge Capacities)](#dual-dp-value-as-state-on-cdot-v_max-for-huge-capacities)
-5. [Complete C++ Implementation](#5-complete-c-implementation)
-6. [Complexity & Complexity Class Analysis: Is Knapsack Polynomial?](#6-complexity--complexity-class-analysis-is-knapsack-polynomial)
+6. [Complete C++ Implementation](#6-complete-c-implementation)
+7. [Complexity & Complexity Class Analysis: Is Knapsack Polynomial?](#7-complexity--complexity-class-analysis-is-knapsack-polynomial)
    - [Pseudo-Polynomial vs True Polynomial Time](#pseudo-polynomial-vs-true-polynomial-time)
    - [Why 0/1 Knapsack is Weakly NP-Complete](#why-01-knapsack-is-weakly-np-complete)
-7. [The Exam Reasoning Question Bank (Challenging Variations)](#7-the-exam-reasoning-question-bank-challenging-variations)
-8. [Curated Medium-to-Hard Problems (LeetCode & Codeforces)](#8-curated-medium-to-hard-problems-leetcode--codeforces)
+8. [The Exam Reasoning Question Bank (Challenging Variations)](#8-the-exam-reasoning-question-bank-challenging-variations)
+9. [Curated Medium-to-Hard Problems (LeetCode & Codeforces)](#9-curated-medium-to-hard-problems-leetcode--codeforces)
    - [Problem 1: Partition Equal Subset Sum (LeetCode 416 - Medium)](#problem-1-partition-equal-subset-sum-leetcode-416---medium)
    - [Problem 2: Knapsack 2 (AtCoder DP Contest / CF - Medium-Hard)](#problem-2-knapsack-2-atcoder-dp-contest--cf---medium-hard)
    - [Problem 3: Fire! Knapsack with Deadlines (Codeforces 864E - Hard)](#problem-3-fire-knapsack-with-deadlines-codeforces-864e---hard)
    - [Problem 4: Ones and Zeroes: 2D Knapsack (LeetCode 474 - Medium-Hard)](#problem-4-ones-and-zeroes-2d-knapsack-leetcode-474---medium-hard)
-9. [Summary Checklist for Exam Day](#9-summary-checklist-for-exam-day)
+10. [Summary Checklist for Exam Day](#10-summary-checklist-for-exam-day)
 
 ---
 
@@ -178,7 +181,168 @@ $$\sum_{j=1}^{k-1} v_j = v_1 \sum_{j=0}^{k-2} 2^j = v_1 (2^{k-1} - 1) < v_1 \cdo
 
 ---
 
-## 4. Dynamic Programming Formulations & Optimizations
+## 4. Slip Test 3 Deep Dive: The Two Thieves / Multiple Knapsack Problem
+
+---
+
+### Puzzle 1: Two Thieves ($W_1 = 15, W_2 = 17$, 7 Items)
+
+> **Exam Question (Slip Test 3, 31 Aug 2026):**  
+> Suppose that two thieves want to rob an apartment. The first thief can carry a weight of up to $15$, and the second can carry a weight of up to $17$. The list of available items is below. How should they maximize the total value of the items they steal?  
+>
+> | Item | Item 1 | Item 2 | Item 3 | Item 4 | Item 5 | Item 6 | Item 7 |
+> | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+> | **Value ($v_i$)** | 24 | 23 | 18 | 20 | 13 | 14 | 11 |
+> | **Weight ($w_i$)** | 8 | 7 | 6 | 5 | 4 | 4 | 3 |
+
+#### Mathematical & Deductive Solution:
+1. **Total System Parameters:**
+   - Total weight of all 7 items:
+     $$\sum_{i=1}^7 w_i = 8 + 7 + 6 + 5 + 4 + 4 + 3 = 37$$
+   - Total carrying capacity of both thieves:
+     $$W_1 + W_2 = 15 + 17 = 32$$
+   - Total value of all 7 items:
+     $$\sum_{i=1}^7 v_i = 24 + 23 + 18 + 20 + 13 + 14 + 11 = 123$$
+
+2. **The Minimum Weight to Leave Behind:**
+   - To fit within the combined capacity of $32$, the thieves must leave behind items whose total weight is **at least**:
+     $$37 - 32 = 5$$
+   - To maximize total value stolen, they must **minimize the total value of items left behind**!
+
+3. **Evaluating Candidates to Leave Behind:**
+   - What single items have weight $\ge 5$?
+     - **Item 4:** Weight $5$, Value $20$ $\implies$ leaves behind value $20$.
+     - **Item 3:** Weight $6$, Value $18$ $\implies$ leaves behind value **$18$**!
+     - **Item 2:** Weight $7$, Value $23$ $\implies$ leaves behind value $23$.
+     - **Item 1:** Weight $8$, Value $24$ $\implies$ leaves behind value $24$.
+   - Any combination of multiple items with total weight $\ge 5$ (e.g., Item 5 + Item 7 = wt $7$, val $24$) has value $\ge 24 > 18$.
+   - **Crucial Deduction:** Leaving behind **Item 3 alone** sacrifices the smallest possible value (**18**) while reducing total weight from $37$ to $31 \le 32$!
+   - Theoretical Upper Bound on Stolen Value $= 123 - 18 = \mathbf{105}$.
+
+4. **Can the Remaining 6 Items Physical Fit into Capacities $15$ and $17$?**
+   The 6 items to pack are:
+   - Item 1 (wt 8, val 24)
+   - Item 2 (wt 7, val 23)
+   - Item 4 (wt 5, val 20)
+   - Item 5 (wt 4, val 13)
+   - Item 6 (wt 4, val 14)
+   - Item 7 (wt 3, val 11)
+   
+   Let us partition them between Thief 1 ($W_1 = 15$) and Thief 2 ($W_2 = 17$):
+   - **Thief 1 (Capacity 15):**  
+     Assign **Item 1 (8) + Item 2 (7)**:
+     $$\text{Weight} = 8 + 7 = 15 \le 15 \quad (\text{Exact fit!})$$
+     $$\text{Value} = 24 + 23 = 47$$
+   - **Thief 2 (Capacity 17):**  
+     Assign **Item 4 (5) + Item 5 (4) + Item 6 (4) + Item 7 (3)**:
+     $$\text{Weight} = 5 + 4 + 4 + 3 = 16 \le 17 \quad (\le 17)$$
+     $$\text{Value} = 20 + 13 + 14 + 11 = 58$$
+
+5. **Final Optimal Result:**
+   $$\text{Total Stolen Value} = 47 + 58 = \mathbf{105}$$
+   - **Thief 1 carries:** Items 1 and 2 (Total weight: 15, Total value: 47)
+   - **Thief 2 carries:** Items 4, 5, 6, and 7 (Total weight: 16, Total value: 58)
+   - **Left Behind:** Item 3 (Weight: 6, Value: 18)
+
+---
+
+### Puzzle 2: General Two-Knapsack Algorithm & Complexity
+
+> **Problem Statement (Slip Test 3):**  
+> Devise an algorithm to solve the knapsack problem with two knapsacks of capacities $W_1$ and $W_2$, respectively. The number of available items is $n$, their weights are $w_1, w_2, \dots, w_n$, and values are $v_1, v_2, \dots, v_n$ (all positive integers).  
+> Provide:
+> - Pseudocode / Code
+> - Explanation of correctness
+> - Runtime analysis
+
+#### 1. Dynamic Programming Formulation
+
+Let $DP(i, c_1, c_2)$ denote the maximum total value achievable using a subset of the first $i$ items such that knapsack 1 has consumed capacity at most $c_1$ and knapsack 2 has consumed capacity at most $c_2$.
+
+- **Base Cases:**
+  $$DP(0, c_1, c_2) = 0 \quad \forall 0 \le c_1 \le W_1, 0 \le c_2 \le W_2$$
+  (With zero items, the maximum achievable value is 0).
+
+- **Recurrence Relation:**
+  For each item $i$ (with weight $w_i$ and value $v_i$), we have three mutually exclusive, exhaustive decisions:
+  1. **Do not steal item $i$:** The capacities $c_1$ and $c_2$ remain unchanged:
+     $$\text{Val}_0 = DP(i-1, c_1, c_2)$$
+  2. **Place item $i$ into Knapsack 1** (valid if $c_1 \ge w_i$):
+     $$\text{Val}_1 = DP(i-1, c_1 - w_i, c_2) + v_i$$
+  3. **Place item $i$ into Knapsack 2** (valid if $c_2 \ge w_i$):
+     $$\text{Val}_2 = DP(i-1, c_1, c_2 - w_i) + v_i$$
+
+  Therefore:
+  $$DP(i, c_1, c_2) = \max \begin{cases}
+  DP(i-1, c_1, c_2) \\
+  DP(i-1, c_1 - w_i, c_2) + v_i & \text{if } c_1 \ge w_i \\
+  DP(i-1, c_1, c_2 - w_i) + v_i & \text{if } c_2 \ge w_i
+  \end{cases}$$
+
+---
+
+#### 2. Space Optimization to 2D Array
+Notice that state $DP(i, \cdot, \cdot)$ depends **only on the previous item layer** $i-1$.  
+Furthermore, transitions only look at strictly smaller capacities $(c_1 - w_i)$ or $(c_2 - w_i)$.  
+Thus, by looping both $c_1$ from $W_1$ **down to $0$** and $c_2$ from $W_2$ **down to $0$**, we can collapse the DP table into a 2D array `dp[c1][c2]`:
+
+$$\text{dp}[c_1][c_2] = \max \begin{cases}
+\text{dp}[c_1][c_2] \\
+\text{dp}[c_1 - w_i][c_2] + v_i & (\text{if } c_1 \ge w_i) \\
+\text{dp}[c_1][c_2 - w_i] + v_i & (\text{if } c_2 \ge w_i)
+\end{cases}$$
+
+---
+
+#### 3. C++ Implementation
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+int solveTwoKnapsacks(int W1, int W2, const vector<int>& weights, const vector<int>& values) {
+    int n = weights.size();
+
+    // 2D DP table initialized to 0
+    vector<vector<int>> dp(W1 + 1, vector<int>(W2 + 1, 0));
+
+    // Process each item one by one
+    for (int i = 0; i < n; ++i) {
+        int w = weights[i];
+        int v = values[i];
+
+        // Traverse capacities backwards to prevent using the same item twice
+        for (int c1 = W1; c1 >= 0; --c1) {
+            for (int c2 = W2; c2 >= 0; --c2) {
+                int option1 = (c1 >= w) ? dp[c1 - w][c2] + v : 0;
+                int option2 = (c2 >= w) ? dp[c1][c2 - w] + v : 0;
+
+                dp[c1][c2] = max({dp[c1][c2], option1, option2});
+            }
+        }
+    }
+
+    return dp[W1][W2];
+}
+```
+
+---
+
+#### 4. Complexity Analysis
+- **Time Complexity:**
+  - There are $n$ outer iterations (one per item).
+  - Inside, two nested loops iterate over all capacities $c_1 \in [0, W_1]$ and $c_2 \in [0, W_2]$.
+  - Each cell transition takes $O(1)$ constant time.
+  - **Total Time Complexity:** $\mathbf{O(n \cdot W_1 \cdot W_2)}$.
+- **Space Complexity:**
+  - With the space-optimized 2D table, memory used is $\mathbf{O(W_1 \cdot W_2)}$.
+  - (The naive 3D table would require $O(n \cdot W_1 \cdot W_2)$ space).
+
+---
+
+## 5. Dynamic Programming Formulations & Optimizations
 
 ### Standard DP: Weight as State ($O(n \cdot W)$)
 Let $dp[i][w]$ be the maximum value achievable using a subset of the first $i$ items with total weight at most $w$.
@@ -227,7 +391,7 @@ Let $dp[v]$ = the **minimum weight** needed to achieve total value $v$.
 
 ---
 
-## 5. Complete C++ Implementation
+## 6. Complete C++ Implementation
 
 ```cpp
 #include <iostream>
@@ -295,7 +459,7 @@ vector<int> reconstructKnapsack(int W, const vector<int>& weights, const vector<
 
 ---
 
-## 6. Complexity & Complexity Class Analysis: Is Knapsack Polynomial?
+## 7. Complexity & Complexity Class Analysis: Is Knapsack Polynomial?
 
 > **Exam Question:** The DP algorithm runs in $O(n \cdot W)$ time. Is this a polynomial-time algorithm?  
 > **Answer:** **NO! It is a PSEUDO-POLYNOMIAL time algorithm.**
@@ -312,7 +476,7 @@ vector<int> reconstructKnapsack(int W, const vector<int>& weights, const vector<
 
 ---
 
-## 7. The Exam Reasoning Question Bank (Challenging Variations)
+## 8. The Exam Reasoning Question Bank (Challenging Variations)
 
 ### Q1: Can 0/1 Knapsack have multiple optimal solutions?
 **Yes.** If different subsets of items sum to the exact same total value and both fit within capacity $W$.
@@ -325,7 +489,7 @@ Then every item has equal value. To maximize the number of items packed, greedil
 
 ---
 
-## 8. Curated Medium-to-Hard Problems (LeetCode & Codeforces)
+## 9. Curated Medium-to-Hard Problems (LeetCode & Codeforces)
 
 Mastering Knapsack requires moving beyond textbook examples to multi-dimensional constraints, dual state representations, and sorting-conditioned knapsacks.
 
@@ -642,7 +806,7 @@ public:
 
 ---
 
-## 9. Summary Checklist for Exam Day
+## 10. Summary Checklist for Exam Day
 
 1. **Fractional $\implies$ Greedy by ratio $v_i/w_i$ is optimal ($O(n \log n)$).**
 2. **0/1 Knapsack $\implies$ Greedy fails; use DP ($O(nW)$).**

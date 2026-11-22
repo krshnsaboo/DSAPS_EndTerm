@@ -37,6 +37,25 @@
 Given two large $n$-digit positive integers $X$ and $Y$, compute their product:
 $$Z = X \times Y$$
 
+### The Baseline: Addition vs Multiplication Complexity
+
+In class notes (`Multiplication.pdf`), Instructor Kshitij Gajjar establishes the fundamental complexity baselines:
+1. **Addition Complexity:**
+   - Adding two integers $a$ and $b$ requires processing their digits from right to left with carry propagation.
+   - The bit-length (number of digits) of an integer $x$ is $\lceil \log_2(x + 1) \rceil$.
+   - Thus, adding $a$ and $b$ requires bit operations bounded by:
+     $$\mathbf{O\big(\max(\log_2 a, \log_2 b)\big) = O(n)}$$
+     where $n$ is the number of digits/bits in the larger number. Addition is strictly **linear** in input size.
+2. **Repeated Addition (Naive Multiplication):**
+   - Computing $a \times b$ by adding $a$ to itself $b$ times takes:
+     $$b \times O(\log_2 a) = O(b \cdot n) \text{ operations}$$
+   - Since $b = 2^{\log_2 b}$, this running time is **exponential** in the bit-length of $b$!
+3. **Schoolbook (Grade-School) Multiplication:**
+   - Instead of $b$ additions, schoolbook multiplication performs $n$ single-digit multiplications and additions:
+     $$n \times O(n) = \mathbf{\Theta(n^2)}$$
+
+---
+
 ### Grade-School (Schoolbook) Multiplication ($\Theta(n^2)$)
 In elementary school, we multiply $X$ by each digit of $Y$, producing $n$ partial products, each of length up to $n+1$, and add them up:
 - Multiplying a single digit of $Y$ across all $n$ digits of $X$: $O(n)$ operations.
@@ -123,17 +142,48 @@ $$\mathbf{X \cdot Y = z_2 \cdot 10^n + (z_1 - z_2 - z_0) \cdot 10^{n/2} + z_0}$$
 
 ---
 
+### Instructor's Visual Karatsuba Architecture: Horizontal Additions vs Vertical Multiplications
+
+In Kshitij Gajjar's lecture diagrams (`Multiplication.pdf`), Karatsuba's process is conceptualized along two orthogonal dimensions:
+```
+           X = [ X1 | X0 ]             Y = [ Y1 | Y0 ]
+                 │    │                      │    │
+                 │    └─── (Horizontal +) ───┤    │  ==> (X1 + X0)
+                 │                           │    │
+                 └──────── (Horizontal +) ───┴────┘  ==> (Y1 + Y0)
+                 │                           │
+  ═══════════════╪═══════════════════════════╪═══════════════════════
+  Vertical       │                           │
+  Multiplications│                           │
+                 ▼                           ▼
+            z2 = X1 * Y1                z0 = X0 * Y0        z1 = (X1+X0)*(Y1+Y0)
+            [Recursive]                 [Recursive]             [Recursive]
+  ═══════════════╪═══════════════════════════╪═══════════════════════
+  Horizontal     │                           │
+  Reconstruction └───────> Middle Term = z1 - z2 - z0 <───────┘
+                                   │
+                                   ▼
+                    Result = z2*10^n + Middle*10^(n/2) + z0
+```
+
+- **Horizontal Operations ($O(n)$):** Pre-addition of $(X_1 + X_0)$ and $(Y_1 + Y_0)$, and post-subtraction $(z_1 - z_2 - z_0)$ along with digit shifts. These take purely linear time.
+- **Vertical Operations ($3 \times T(n/2)$):** The 3 recursive multiplications that descend the recursion tree.
+
+---
+
 ### The 3-Subproblem Recurrence & Master Theorem Proof
 
 Instead of 4 recursive calls of size $n/2$, Karatsuba makes **only 3 recursive calls**:
 $$T(n) = 3 T(n/2) + O(n)$$
 
 #### Solving via the Master Theorem:
-- $a = 3$
-- $b = 2$
-- $f(n) = O(n)$
-- Critical exponent: $\log_b a = \log_2 3 \approx \mathbf{1.58496}$.
-- Since $f(n) = O(n^1) = O(n^{\log_2 3 - \epsilon})$ where $\epsilon \approx 0.585 > 0$, **Case 1 of the Master Theorem applies**:
+- $a = 3$ (number of subproblems)
+- $b = 2$ (factor by which input size shrinks)
+- $f(n) = O(n)$ (linear work for additions and shifts)
+- **Critical Exponent (Change of Base):**
+  $$\log_b a = \log_2 3 = \frac{\ln 3}{\ln 2} \approx \frac{1.098612}{0.693147} \approx \mathbf{1.58496}$$
+- Since $f(n) = O(n^1) = O(n^{\log_2 3 - \epsilon})$ where $\epsilon = 1.585 - 1 = 0.585 > 0$, **Case 1 of the Master Theorem applies**:
+  $$T(n) = \mathbf{\Theta(n^{\log_2 3}) \approx \Theta(n^{1.585})}$$
   $$T(n) = \mathbf{\Theta(n^{\log_2 3}) \approx \Theta(n^{1.585})}$$
 
 For $n = 10,000$ digits:

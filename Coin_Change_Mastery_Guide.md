@@ -13,9 +13,10 @@
    - [The Greedy Strategy](#the-greedy-strategy)
    - [Classic Counterexamples Where Greedy Fails](#classic-counterexamples-where-greedy-fails)
    - [What Makes a Coin System Canonical? (Pearson's Test)](#what-makes-a-coin-system-canonical-pearsons-test)
-3. [Deep Analysis of the Slip Test PYQ (Puzzle 4)](#3-deep-analysis-of-the-slip-test-pyq-puzzle-4)
-   - [Is $O(n \cdot A)$ a Polynomial-Time Algorithm?](#is-on-cdot-a-a-polynomial-time-algorithm)
-   - [The Exact Proof of Pseudo-Polynomial Complexity](#the-exact-proof-of-pseudo-polynomial-complexity)
+3. [Slip Test 1 Deep Dive: Bounded Denominations & Complexity Analysis](#3-slip-test-1-deep-dive-bounded-denominations--complexity-analysis)
+   - [Slip Test 1 (10 Aug 2026) - Puzzle 1: Amounts 45, 59, 1000](#slip-test-1-10-aug-2026---puzzle-1-amounts-45-59-1000)
+   - [Slip Test 1 (10 Aug 2026) - Puzzle 2: General Bounded Algorithm & Complexity](#slip-test-1-10-aug-2026---puzzle-2-general-bounded-algorithm--complexity)
+   - [Slip Test PYQ: Is $O(n \cdot A)$ a Polynomial-Time Algorithm?](#slip-test-pyq-is-on-cdot-a-a-polynomial-time-algorithm)
 4. [Dynamic Programming Formulations & The Permutation vs Combination Trap](#4-dynamic-programming-formulations--the-permutation-vs-combination-trap)
    - [Min Coins Formulation ($O(n \cdot A)$)](#min-coins-formulation-on-cdot-a)
    - [The #1 Exam Trap: Combinations vs Permutations](#the-1-exam-trap-combinations-vs-permutations)
@@ -94,7 +95,183 @@ A coin system is called **canonical** if the greedy algorithm yields the optimal
 
 ---
 
-## 3. Deep Analysis of the Slip Test PYQ (Puzzle 4)
+## 3. Slip Test 1 Deep Dive: Bounded Denominations & Complexity Analysis
+
+---
+
+### Slip Test 1 (10 Aug 2026) - Puzzle 1: Amounts 45, 59, 1000
+
+> **Problem Statement:**  
+> Suppose you are given coins of denomination $1, 6, 8,$ and $13$.  
+> Denominations $1, 6,$ and $8$ are available in **unlimited** quantities, but denomination $13$ is available only in a **maximum quantity of 2** (i.e., at most two $13$-coins).  
+> What is the minimum number of coins needed to make:  
+> **(a) 45**  
+> **(b) 59**  
+> **(c) 1000**
+
+#### Core Intuition & Methodology
+Because $13$ is the only bounded denomination and can only be used $0, 1,$ or $2$ times, we evaluate each candidate count $m \in \{0, 1, 2\}$ for the coin $13$:
+$$\text{Min Coins}(A) = \min_{m \in \{0, 1, 2\}, 13m \le A} \Big( m + \text{UnboundedMinCoins}_{\{1, 6, 8\}}(A - 13m) \Big)$$
+
+For the unbounded coin set $\{1, 6, 8\}$, notice:
+- $8$ is the largest greedy choice, but $6$ helps bridge remainders without dropping all the way to $1$.
+- Any remainder modulo $8$ can be formed efficiently:
+  - Remainder $0$: multiples of $8$.
+  - Remainder $6$: one $6$ coin.
+  - Remainder $4$: $8 \times 0 + 6 \times 0 + 4 \times 1$ (or $6 \times 2 = 12 \equiv 4 \pmod 8$ using $12 - 8 = 4$).
+  - Two $6$s sum to $12 = 8 + 4$. Three $6$s sum to $18 = 8 \times 2 + 2$.
+
+---
+
+#### Detailed Solution for (a) $A = 45$:
+1. **Case $m = 0$ (No 13s used):**
+   - Amount needed: $45$ using $\{1, 6, 8\}$.
+   - $45 = 5 \times 8 + 5 \times 1 \implies 10$ coins.
+   - Or $45 = 4 \times 8 + 2 \times 6 + 1 \times 1 = 32 + 12 + 1 = 45 \implies 4 + 2 + 1 = 7$ coins.
+2. **Case $m = 1$ (One 13 used):**
+   - Remainder: $45 - 13 = 32$.
+   - $32$ is an exact multiple of $8$: $32 = 4 \times 8$.
+   - Coins used: $1$ (of 13) $+ 4$ (of 8) = **5 coins**.
+   - Breakdown: $\{13, 8, 8, 8, 8\}$ (Sum: $13 + 32 = 45$).
+3. **Case $m = 2$ (Two 13s used):**
+   - Remainder: $45 - 26 = 19$.
+   - Using $\{1, 6, 8\}$: $19 = 2 \times 8 + 3 \times 1 \implies 5$ coins, or $1 \times 8 + 1 \times 6 + 5 \times 1 \implies 7$ coins.
+   - Total coins: $2 + 5 = 7$ coins.
+
+**Answer for (a):** Minimum coins = **5** ($\mathbf{1 \times 13 + 4 \times 8}$).
+
+---
+
+#### Detailed Solution for (b) $A = 59$:
+1. **Case $m = 0$ (No 13s used):**
+   - Remainder: $59$.
+   - $59 = 7 \times 8 + 3 \times 1 \implies 10$ coins.
+   - $59 = 5 \times 8 + 3 \times 6 + 1 \times 1 = 40 + 18 + 1 = 59 \implies 5 + 3 + 1 = 9$ coins.
+2. **Case $m = 1$ (One 13 used):**
+   - Remainder: $59 - 13 = 46$.
+   - Best combination for $46$ using $\{1, 6, 8\}$:
+     $$46 = 5 \times 8 + 1 \times 6 = 40 + 6 = 46 \implies 6 \text{ coins}$$
+   - Total coins: $1$ (of 13) $+ 6 = \mathbf{7 \text{ coins}}$.
+   - Breakdown: $\{13, 8, 8, 8, 8, 8, 6\}$.
+3. **Case $m = 2$ (Two 13s used):**
+   - Remainder: $59 - 26 = 33$.
+   - Best combination for $33$:
+     $$33 = 4 \times 8 + 1 \times 1 = 32 + 1 = 33 \implies 5 \text{ coins}$$
+   - Total coins: $2$ (of 13) $+ 5 = \mathbf{7 \text{ coins}}$.
+   - Breakdown: $\{13, 13, 8, 8, 8, 8, 1\}$.
+
+**Answer for (b):** Minimum coins = **7** ($\mathbf{1 \times 13 + 5 \times 8 + 1 \times 6}$ or $\mathbf{2 \times 13 + 4 \times 8 + 1 \times 1}$).
+
+---
+
+#### Detailed Solution for (c) $A = 1000$:
+For large amounts, we maximize the usage of the largest available denominations:
+1. **Case $m = 0$:**
+   - $1000 = 125 \times 8 \implies 125$ coins.
+2. **Case $m = 1$:**
+   - Remainder: $1000 - 13 = 987$.
+   - $987 = 123 \times 8 + 3 \times 1 \implies 123 + 3 = 126$ coins.
+   - Or $987 = 122 \times 8 + 1 \times 6 + 5 \times 1 = 976 + 6 + 5 \implies 128$ coins.
+   - (With 1 coin of 13, total is at least $1 + 124 = 125$ coins).
+3. **Case $m = 2$ (Two 13s used):**
+   - Total from two 13s: $2 \times 13 = 26$.
+   - Remainder: $1000 - 26 = 974$.
+   - Divide $974$ by $8$:
+     $$974 = 121 \times 8 + 6$$
+   - Remainder is exactly $6$, which matches the denomination $6$!
+   - Thus, $974$ requires only $121$ coins of $8$ and $1$ coin of $6$, giving $121 + 1 = 122$ coins!
+   - Adding the two $13$s:
+     $$\text{Total coins} = 2 + 121 + 1 = \mathbf{124 \text{ coins}}$$
+
+**Answer for (c):** Minimum coins = **124** ($\mathbf{2 \times 13 + 121 \times 8 + 1 \times 6}$).
+
+---
+
+### Slip Test 1 (10 Aug 2026) - Puzzle 2: General Bounded Algorithm & Complexity
+
+> **Problem Statement:**  
+> Write an algorithm for the general problem where there are $n$ coin denominations $c_1, c_2, \dots, c_n$, where denominations $c_1, c_2, \dots, c_{n-1}$ are available in **unlimited** quantities, but denomination $c_n$ is available in **at most $k$** quantity, to make an amount $A$. What is its time complexity?
+
+#### Algorithmic Design: Two-Stage DP Approach
+
+Rather than maintaining a full 2D state space over all combinations, we exploit the structure:
+1. Only $c_n$ has a capacity constraint $k$.
+2. The remaining denominations $c_1, \dots, c_{n-1}$ are standard unbounded coins.
+
+```
+Algorithm BoundedCoinChange(C[1..n], k, A):
+1. Initialize an array DP[0..A] with infinity
+2. DP[0] = 0
+3. // Step 1: Unbounded DP using first n-1 denominations
+4. For i = 1 to n - 1:
+5.     coin = C[i]
+6.     For x = coin to A:
+7.         If DP[x - coin] != infinity:
+8.             DP[x] = min(DP[x], DP[x - coin] + 1)
+9.
+10. // Step 2: Try each valid number of copies of c_n from 0 to k
+11. min_total_coins = infinity
+12. For m = 0 to min(k, floor(A / C[n])):
+13.     rem = A - m * C[n]
+14.     If DP[rem] != infinity:
+15.         min_total_coins = min(min_total_coins, m + DP[rem])
+16.
+17. Return min_total_coins
+```
+
+#### C++ Implementation
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+const int INF = 1e9;
+
+int minCoinsBoundedLast(const vector<int>& c, int k, int A) {
+    int n = c.size();
+    // DP array for unbounded coins c[0 ... n-2]
+    vector<int> dp(A + 1, INF);
+    dp[0] = 0;
+
+    // Stage 1: Fill unbounded DP for first n - 1 coins
+    for (int i = 0; i < n - 1; ++i) {
+        for (int x = c[i]; x <= A; ++x) {
+            if (dp[x - c[i]] != INF) {
+                dp[x] = min(dp[x], dp[x - c[i]] + 1);
+            }
+        }
+    }
+
+    // Stage 2: Enumerate m copies of the bounded coin c[n-1]
+    int best = INF;
+    int max_m = min(k, A / c[n - 1]);
+    for (int m = 0; m <= max_m; ++m) {
+        int rem = A - m * c[n - 1];
+        if (dp[rem] != INF) {
+            best = min(best, m + dp[rem]);
+        }
+    }
+
+    return (best >= INF) ? -1 : best;
+}
+```
+
+#### Exact Complexity Analysis:
+- **Time Complexity:**
+  - Stage 1 (Unbounded DP on $n-1$ coins): $(n - 1)$ iterations over an array of size $A$, taking $O((n - 1) \cdot A)$ operations.
+  - Stage 2 (Enumerate $m \in \{0, \dots, \min(k, \lfloor A / c_n \rfloor)\}$): takes $O(\min(k, A / c_n))$ operations.
+  - **Total Time Complexity:**
+    $$O\Big(n \cdot A + \min\big(k, \frac{A}{c_n}\big)\Big) = \mathbf{O(n \cdot A + k)}$$
+  - Notice that if $k$ is small (like $k = 2$ in Puzzle 1), Stage 2 runs in $O(1)$, so the time complexity is strictly $O(n \cdot A)$!
+- **Space Complexity:**
+  - We only store a 1D array of size $A + 1$.
+  - **Total Space Complexity:** $\mathbf{O(A)}$.
+
+---
+
+### Slip Test PYQ: Is $O(n \cdot A)$ a Polynomial-Time Algorithm?
 
 > **Exam Question (Slip Test 2, Puzzle 4):**  
 > *"In the coin denominations problem, if there are $n$ different denominations, and the total amount is $A$, then the running time of the algorithm which we studied in class is $O(n \cdot A)$. Is this a polynomial-time algorithm?"*  
@@ -103,22 +280,21 @@ A coin system is called **canonical** if the greedy algorithm yields the optimal
 
 **Verdict:** **B. NO! It is a PSEUDO-POLYNOMIAL time algorithm.**
 
-### The Exact Proof:
-1. In theoretical computer science, an algorithm is **polynomial** if its running time is bounded by a polynomial function of the **length of the input in bits**.
-2. **What is the input to this problem?**
-   - The array of $n$ coin denominations: $C = \{c_1, \dots, c_n\}$.
-   - The integer target amount: $A$.
-3. **How many bits does it take to write down $A$?**
-   - Writing the number $A$ in binary requires:
-     $$L = \lceil \log_2 A \rceil \text{ bits}$$
-4. **What is the value of $A$ in terms of its bit-length $L$?**
+#### The Exact Mathematical Proof:
+1. In theoretical computer science, an algorithm runs in **polynomial time** if and only if its running time is bounded by a polynomial function of the **size of the input in bits** (denoted as $L$).
+2. **What constitutes the input?**
+   - The list of $n$ coin values: $C = \{c_1, \dots, c_n\}$.
+   - The target integer amount: $A$.
+3. **How many bits are needed to encode $A$?**
+   - Writing down an integer $A$ in standard binary requires:
+     $$L = \lceil \log_2(A + 1) \rceil \text{ bits}$$
+4. **What is the numerical magnitude of $A$ in terms of input length $L$?**
    $$A \approx 2^L$$
 5. **Substitute $A = 2^L$ into the running time:**
    $$\text{Running Time} = O(n \cdot A) = O(n \cdot 2^L)$$
-6. Notice that $2^L$ is an **exponential function** of the input bit-length $L$!
-7. Therefore, the algorithm's running time is **exponential in the input size**, making it **pseudo-polynomial**, not polynomial!
-
-*(Note: If $A$ were written in unary, e.g., $A$ tally marks `111...1`, the input length would be $A$ bits, and only then would it be considered polynomial).*
+6. The running time is **exponential** in the number of bits required to represent $A$!
+7. Therefore, the algorithm is **pseudo-polynomial**, not truly polynomial.
+   - *Exam Distinction:* If $A$ were provided in **unary encoding** (e.g., $A$ tally marks `111...1`), the input size would be $L = A$ bits, and in that representation alone, the algorithm would be formally polynomial. But under standard binary encoding, it is strictly pseudo-polynomial!
 
 ---
 

@@ -25,16 +25,19 @@
    - [Longest Palindromic Subsequence (LPS)](#longest-palindromic-subsequence-lps)
    - [Longest Increasing Subsequence (LIS)](#longest-increasing-subsequence-lis)
 6. [Complete Production-Grade C++ Implementation](#6-complete-production-grade-c-implementation)
-7. [Advanced Exam Variations & Twisted Scenarios](#7-advanced-exam-variations--twisted-scenarios)
+7. [Slip Test 2 Deep Dive: Edit Distance (Levenshtein Distance)](#7-slip-test-2-deep-dive-edit-distance-levenshtein-distance)
+   - [Slip Test 2 (17 Aug 2026) - Puzzle 1: Evaluations with Exact Notation](#slip-test-2-17-aug-2026---puzzle-1-evaluations-with-exact-notation)
+   - [Slip Test 2 (17 Aug 2026) - Puzzle 2: Full Algorithm, Proof & Complexity](#slip-test-2-17-aug-2026---puzzle-2-full-algorithm-proof--complexity)
+8. [Advanced Exam Variations & Twisted Scenarios](#8-advanced-exam-variations--twisted-scenarios)
    - [Variation 1: LCS of $k$ Strings (Is It Polynomial?)](#variation-1-lcs-of-k-strings-is-it-polynomial)
    - [Variation 2: When Does Greedy Work for LCS?](#variation-2-when-does-greedy-work-for-lcs)
    - [Variation 3: Counting the Total Number of Distinct LCS Strings](#variation-3-counting-the-total-number-of-distinct-lcs-strings)
-8. [Curated Medium-to-Hard Problems (LeetCode & Codeforces)](#8-curated-medium-to-hard-problems-leetcode--codeforces)
+9. [Curated Medium-to-Hard Problems (LeetCode & Codeforces)](#9-curated-medium-to-hard-problems-leetcode--codeforces)
    - [Problem 1: Shortest Common Supersequence (LeetCode 1092 - Hard)](#problem-1-shortest-common-supersequence-leetcode-1092---hard)
    - [Problem 2: Distinct Subsequences Counting (LeetCode 115 - Hard)](#problem-2-distinct-subsequences-counting-leetcode-115---hard)
    - [Problem 3: Catching Cheaters (Codeforces 1446B - Medium-Hard)](#problem-3-catching-cheaters-codeforces-1446b---medium-hard)
    - [Problem 4: Levenshtein Edit Distance (LeetCode 72 - Medium-Hard)](#problem-4-levenshtein-edit-distance-leetcode-72---medium-hard)
-9. [Exam Day Summary Checklist](#9-exam-day-summary-checklist)
+10. [Exam Day Summary Checklist](#10-exam-day-summary-checklist)
 
 ---
 
@@ -120,6 +123,40 @@ Start at cell $(m, n)$ and backtrack to $(0, 0)$:
 ### Can There Be Multiple LCS Strings?
 **YES!** When $dp[i-1][j] == dp[i][j-1]$, branching both UP and LEFT yields different valid LCS strings.  
 *Example:* $X = \text{"AB"}, Y = \text{"BA"}$. LCS length is 1, and both $\text{"A"}$ and $\text{"B"}$ are valid LCS strings!
+
+---
+
+### Step-by-Step Lecture Walkthrough: $X = \text{"bafdecafdc"}$ vs $Y = \text{"abcdef"}$
+
+*(Directly from Instructor Kshitij Gajjar's lecture slides `Longest common subsequence.pdf`)*
+
+Let $X = \text{"b a f d e c a f d c"}$ ($m = 10$) and $Y = \text{"a b c d e f"}$ ($n = 6$).  
+The rows represent characters of $Y$, and the columns represent characters of $X$:
+
+```
+        Ø   b   a   f   d   e   c   a   f   d   c
+    Ø   0   0   0   0   0   0   0   0   0   0   0
+    a   0   0   1   1   1   1   1   1   1   1   1
+    b   0   1   1   1   1   1   1   1   1   1   1
+    c   0   1   1   1   1   1   2   2   2   2   2
+    d   0   1   1   1   2   2   2   2   2   3   3
+    e   0   1   1   1   2   3   3   3   3   3   3
+    f   0   1   1   2   2   3   3   3   4   4   4
+```
+
+#### Key Exam Observations from the Slides:
+1. **The "Pause: We need to compute cell $X$" Question (Slide 31):**
+   - At cell row `e`, column `b` (prefix `b` of $X$ and prefix `abcde` of $Y$):
+     - Character `b` does not match `e`.
+     - The cell takes $\max(dp[\text{row } e-1, b], dp[\text{row } e, \emptyset]) = \max(1, 0) = 1$.
+2. **Final LCS Length:**
+   - Look at the bottom-right cell: $dp[6][10] = \mathbf{4}$.
+3. **Multiple Optimal Solutions (Reconstruction):**
+   - Tracing back from the bottom-right cell reveals multiple valid LCS strings of length 4:
+     - $\text{"a d e f"}$ (using $X[2]=\text{'a'}, X[4]=\text{'d'}, X[5]=\text{'e'}, X[9]=\text{'f'}$)
+     - $\text{"b d e f"}$ (using $X[1]=\text{'b'}, X[4]=\text{'d'}, X[5]=\text{'e'}, X[9]=\text{'f'}$)
+     - $\text{"a c d c"}$ / $\text{"b c d c"}$
+   - In an exam, if asked for **all** LCS strings, branch at every cell where $dp[i-1][j] == dp[i][j-1]$.
 
 ---
 
@@ -252,7 +289,206 @@ int lcsLengthOptimized(const string& X, const string& Y) {
 
 ---
 
-## 7. Advanced Exam Variations & Twisted Scenarios
+## 7. Slip Test 2 Deep Dive: Edit Distance (Levenshtein Distance)
+
+---
+
+### Slip Test 2 (17 Aug 2026) - Overview & Notation
+
+In Slip Test 2, Instructor Kshitij Gajjar introduced **Levenshtein Distance**, defined as the minimum number of edit operations needed to transform string $A$ into string $B$.  
+Permissible operations:
+1. **Letter Insertions**
+2. **Letter Deletions**
+3. **Letter Substitutions / Replacements**
+
+#### Instructor's Exact Evaluation Notation:
+1. **Alignment Representation:** Align the two words in two parallel rows. Gaps (blank spaces) in the bottom row represent **deletions** from the first word; gaps in the top row represent **insertions** into the first word; mismatched characters aligned vertically represent **substitutions**.
+2. **Step-by-Step Transformation Sequence:** Show the word progressively changing one character at a time from word $A$ to word $B$.
+3. **Distance Declaration:** Conclude with $\text{dist}(A, B) = k$.
+
+---
+
+### Slip Test 2 - Puzzle 1 [3 Marks]: Evaluations
+
+#### 1. $\text{dist}(\text{"sleeveless"}, \text{"lessens"})$
+
+- **Length of $A$ ("sleeveless"):** 10
+- **Length of $B$ ("lessens"):** 7
+- **Alignment Representation:**
+  ```
+  s   l   e   e   v   e   l   e   s   s
+      l       e       s   s   e   n   s
+  ```
+- **Step-by-Step Transformation:**
+  1. Delete `s` $\to$ `leeveless`
+  2. Delete `e` $\to$ `leveless`
+  3. Delete `v` $\to$ `leless`
+  4. Substitute `e` $\to$ `s` $\to$ `lsless` (or replace `l` $\to$ `s`)
+  5. Substitute `l` $\to$ `e` $\to$ `lsens`
+  6. Substitute `s` $\to$ `n` $\to$ `lessens`
+- **Minimum Edit Operations:** 3 deletions + 3 substitutions = **6 operations**.
+- **Verdict:**
+  $$\mathbf{dist(\text{"sleeveless"}, \text{"lessens"}) = 6}$$
+
+---
+
+#### 2. $\text{dist}(\text{"intelligent"}, \text{"belligerent"})$
+
+- **Length of $A$ ("intelligent"):** 11
+- **Length of $B$ ("belligerent"):** 11
+- **Key Observation:** The core substring `"ellig"` and suffix `"ent"` match across both words!
+- **Alignment Representation:**
+  ```
+  i   n   t   e   l   l   i   g           e   n   t
+          b   e   l   l   i   g   e   r   e   n   t
+  ```
+- **Step-by-Step Transformation:**
+  1. Delete `i` $\to$ `ntelligent`
+  2. Delete `n` $\to$ `telligent`
+  3. Substitute `t` $\to$ `b` $\to$ `belligent`
+  4. Insert `e` after `g` $\to$ `belligeent`
+  5. Insert `r` after `e` $\to$ `belligerent`
+- **Minimum Edit Operations:** 2 deletions + 1 substitution + 2 insertions = **5 operations**.
+- **Verdict:**
+  $$\mathbf{dist(\text{"intelligent"}, \text{"belligerent"}) = 5}$$
+
+---
+
+#### 3. $\text{dist}(\text{"melanin"}, \text{"millennial"})$
+
+- **Length of $A$ ("melanin"):** 7
+- **Length of $B$ ("millennial"):** 10
+- **Key Insight:** Notice that in `"melanin"`, `e` comes before `l`, whereas in `"millennial"`, `l` comes before `e`. Thus, `e` and `l` cannot both be matched simultaneously without an edit.
+- **Alignment Representation:**
+  ```
+  m       e   l       a   n   i       n
+  m   i   l   l   e   n   n   i   a   l
+  ```
+- **Step-by-Step Transformation:**
+  1. Insert `i` after `m` $\to$ `mielanin`
+  2. Substitute `e` $\to$ `l` $\to$ `millanin`
+  3. Insert `e` after second `l` $\to$ `milleanin`
+  4. Substitute `a` $\to$ `n` $\to$ `millennin`
+  5. Insert `a` after `i` $\to$ `millennian`
+  6. Substitute final `n` $\to$ `l` $\to$ `millennial`
+- **Minimum Edit Operations:** 3 insertions + 3 substitutions = **6 operations**.
+- **Verdict:**
+  $$\mathbf{dist(\text{"melanin"}, \text{"millennial"}) = 6}$$
+
+---
+
+### Slip Test 2 - Puzzle 2 [7 Marks]: The Full Edit Distance Algorithm
+
+> **Problem Statement:**  
+> Devise an algorithm to find the distance between two strings $A$ and $B$ of lengths $n_1$ and $n_2$, respectively. Grade parameters:
+> - Code / pseudocode.
+> - Explanation of its working.
+> - Analysis of its runtime.
+
+#### 1. Mathematical Formulation & Recurrence
+Let $DP[i][j]$ denote the minimum edit distance between the prefix $A[1..i]$ (of length $i$) and prefix $B[1..j]$ (of length $j$).
+
+- **Base Cases:**
+  - $DP[0][j] = j$: Transforming an empty string $\emptyset$ into prefix $B[1..j]$ requires $j$ insertions.
+  - $DP[i][0] = i$: Transforming prefix $A[1..i]$ into empty string $\emptyset$ requires $i$ deletions.
+  - $DP[0][0] = 0$: Both strings empty, zero cost.
+
+- **Recurrence Relation:**
+  For $1 \le i \le n_1$ and $1 \le j \le n_2$:
+  $$DP[i][j] = \begin{cases}
+  DP[i-1][j-1] & \text{if } A[i] = B[j] \text{ (Free Match)} \\
+  1 + \min \begin{cases}
+  DP[i-1][j] & \text{(Deletion of } A[i] \text{)} \\
+  DP[i][j-1] & \text{(Insertion of } B[j] \text{)} \\
+  DP[i-1][j-1] & \text{(Substitution of } A[i] \to B[j] \text{)}
+  \end{cases} & \text{if } A[i] \ne B[j]
+  \end{cases}$$
+
+---
+
+#### 2. Explanation of Working & Correctness
+- **Optimal Substructure:** Any optimal sequence of edits transforming $A[1..i]$ to $B[1..j]$ must end in one of three operations on the last characters:
+  1. **Delete $A[i]$:** We already transformed $A[1..i-1]$ to $B[1..j]$ at cost $DP[i-1][j]$, and now delete $A[i]$ ($+1$).
+  2. **Insert $B[j]$:** We already transformed $A[1..i]$ to $B[1..j-1]$ at cost $DP[i][j-1]$, and now insert $B[j]$ at the end ($+1$).
+  3. **Substitute $A[i] \to B[j]$:** We already transformed $A[1..i-1]$ to $B[1..j-1]$ at cost $DP[i-1][j-1]$, and substitute $A[i]$ with $B[j]$ ($+1$). If $A[i] == B[j]$, no substitution cost is incurred ($+0$).
+- By taking the minimum over all three locally exhaustive choices, dynamic programming guarantees the global minimum edit distance.
+
+---
+
+#### 3. Pseudocode
+```
+Algorithm EditDistance(A[1..n1], B[1..n2]):
+1. Create 2D array DP[0..n1][0..n2]
+2. For i = 0 to n1: DP[i][0] = i
+3. For j = 0 to n2: DP[0][j] = j
+4.
+5. For i = 1 to n1:
+6.     For j = 1 to n2:
+7.         If A[i] == B[j]:
+8.             DP[i][j] = DP[i-1][j-1]
+9.         Else:
+10.            DP[i][j] = 1 + min({ DP[i-1][j],      // Deletion
+11.                                 DP[i][j-1],      // Insertion
+12.                                 DP[i-1][j-1] })  // Substitution
+13.
+14. Return DP[n1][n2]
+```
+
+---
+
+#### 4. C++ Implementation
+```cpp
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+
+using namespace std;
+
+int editDistance(const string& A, const string& B) {
+    int n1 = A.size();
+    int n2 = B.size();
+
+    // DP table of size (n1 + 1) x (n2 + 1)
+    vector<vector<int>> dp(n1 + 1, vector<int>(n2 + 1, 0));
+
+    // Base cases
+    for (int i = 0; i <= n1; ++i) dp[i][0] = i;
+    for (int j = 0; j <= n2; ++j) dp[0][j] = j;
+
+    // Fill the DP table
+    for (int i = 1; i <= n1; ++i) {
+        for (int j = 1; j <= n2; ++j) {
+            if (A[i - 1] == B[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1]; // Match
+            } else {
+                dp[i][j] = 1 + min({
+                    dp[i - 1][j],     // Deletion
+                    dp[i][j - 1],     // Insertion
+                    dp[i - 1][j - 1]  // Substitution
+                });
+            }
+        }
+    }
+
+    return dp[n1][n2];
+}
+```
+
+---
+
+#### 5. Complexity Analysis
+- **Time Complexity:**
+  - The DP table contains $(n_1 + 1) \times (n_2 + 1)$ cells.
+  - Computing each cell involves a constant number of comparisons ($O(1)$ arithmetic operations).
+  - **Total Time Complexity:** $\mathbf{O(n_1 \cdot n_2)}$.
+- **Space Complexity:**
+  - Storing the 2D DP matrix requires $\mathbf{O(n_1 \cdot n_2)}$ memory.
+  - *Space Optimization Note:* If only the distance is required (without reconstructing the edit script), we only need the current and previous rows, reducing space to $\mathbf{O(\min(n_1, n_2))}$.
+
+---
+
+## 8. Advanced Exam Variations & Twisted Scenarios
 
 ### Variation 1: LCS of $k$ Strings (Is It Polynomial?)
 - For $k = 3$ strings of length $n$: $dp[i][j][k]$ runs in $O(n^3)$ time, which is polynomial.
@@ -264,7 +500,7 @@ int lcsLengthOptimized(const string& X, const string& Y) {
 
 ---
 
-## 8. Curated Medium-to-Hard Problems (LeetCode & Codeforces)
+## 9. Curated Medium-to-Hard Problems (LeetCode & Codeforces)
 
 Mastering LCS requires excelling at supersequence interleaving, distinct subsequence counting, and substring-penalized DP variants.
 
@@ -503,7 +739,7 @@ public:
 
 ---
 
-## 9. Exam Day Summary Checklist
+## 10. Exam Day Summary Checklist
 
 1. **Subsequence $\ne$ Substring** (Subsequence allows skips).
 2. **$dp[i][j] = dp[i-1][j-1] + 1$ on match; $\max(dp[i-1][j], dp[i][j-1])$ on mismatch.**

@@ -15,10 +15,13 @@
 3. [Strassen’s Algorithm: Breaking the $\Theta(n^3)$ Barrier](#3-strassens-algorithm-breaking-the-thetan3-barrier)
    - [The Breakthrough: Reducing 8 Multiplications to 7](#the-breakthrough-reducing-8-multiplications-to-7)
    - [The 7 Magic Products ($M_1$ through $M_7$)](#the-7-magic-products-m_1-through-m_7)
-   - [Reconstructing the Product Matrix $C$](#reconstructing-the-product-matrix-c)
-   - [Master Theorem Proof of $O(n^{\log_2 7}) \approx O(n^{2.807})$](#master-theorem-proof-of-onlog_2-7-approx-on2807)
+   - [Reconstructing the Product Matrix $C$ (Slip Test 4, Puzzle 1)](#reconstructing-the-product-matrix-c-slip-test-4-puzzle-1)
+   - [Master Theorem Proof of $O(n^{\log_2 7}) \approx O(n^{2.807})$ (Slip Test 4, Puzzle 2)](#master-theorem-proof-of-onlog_2-7-approx-on2807-slip-test-4-puzzle-2)
+   - [Exact Count of Total Arithmetic Operations: $7n^{\log_2 7} - 6n^2$ (Slip Test 4 Bonus)](#exact-count-of-total-arithmetic-operations-7nlog_2-7---6n2-slip-test-4-bonus)
    - [Practical Considerations: Crossover Threshold & Numerical Stability](#practical-considerations-crossover-threshold--numerical-stability)
-4. [The Theoretical Frontier of Matrix Multiplication ($\omega$)](#4-the-theoretical-frontier-of-matrix-multiplication-omega)
+4. [The Theoretical Frontier of Matrix Multiplication & AlphaTensor](#4-the-theoretical-frontier-of-matrix-multiplication--alphatensor)
+   - [DeepMind AlphaTensor: $4 \times 4$ Binary Matrices (Slip Test 4, Puzzle 3)](#deepmind-alphatensor-4-times-4-binary-matrices-slip-test-4-puzzle-3)
+   - [The Timeline of Exponent $\omega$](#the-timeline-of-exponent-omega)
 5. [Matrix Chain Multiplication (MCM): Dynamic Programming](#5-matrix-chain-multiplication-mcm-dynamic-programming)
    - [Why Order of Multiplication Matters (The 10x Cost Explosion)](#why-order-of-multiplication-matters-the-10x-cost-explosion)
    - [Why Brute Force Fails (The Catalan Number Explosion)](#why-brute-force-fails-the-catalan-number-explosion)
@@ -95,30 +98,105 @@ Each $M_k$ is computed using **exactly ONE multiplication** of linear combinatio
 
 ---
 
-### Reconstructing the Product Matrix $C$
-Using only additions and subtractions:
-- $C_{11} = M_1 + M_4 - M_5 + M_7$
-- $C_{12} = M_3 + M_5$
-- $C_{21} = M_2 + M_4$
-- $C_{22} = M_1 - M_2 + M_3 + M_6$
+### Reconstructing the Product Matrix $C$ (Slip Test 4, Puzzle 1)
 
-#### Verification of $C_{11}$:
-$$M_1 + M_4 - M_5 + M_7$$
-$$= (A_{11}B_{11} + A_{11}B_{22} + A_{22}B_{11} + A_{22}B_{22}) + (A_{22}B_{21} - A_{22}B_{11}) - (A_{11}B_{22} + A_{12}B_{22}) + (A_{12}B_{21} + A_{12}B_{22} - A_{22}B_{21} - A_{22}B_{22})$$
-$$= A_{11} B_{11} + A_{12} B_{21} \equiv C_{11}! \quad \checkmark$$
+In Slip Test 4 (3 Sept 2026), you are given the 7 Strassen variables $m_1 \dots m_7$ and the formula $c_{12} = m_3 + m_5$, and asked to evaluate $c_{11}, c_{21}, c_{22}$ using only addition and subtraction operations:
+
+- **$c_{11} = m_1 + m_4 - m_5 + m_7$**
+- **$c_{12} = m_3 + m_5$** *(given as reference)*
+- **$c_{21} = m_2 + m_4$**
+- **$c_{22} = m_1 - m_2 + m_3 + m_6$**
+
+#### Rigorous Algebraic Verifications:
+
+1. **Verification of $c_{11}$:**
+   $$m_1 = a_{11}b_{11} + a_{11}b_{22} + a_{22}b_{11} + a_{22}b_{22}$$
+   $$m_4 = a_{22}b_{21} - a_{22}b_{11}$$
+   $$-m_5 = -a_{11}b_{22} - a_{12}b_{22}$$
+   $$m_7 = a_{12}b_{21} + a_{12}b_{22} - a_{22}b_{21} - a_{22}b_{22}$$
+   Summing:
+   $$m_1 + m_4 - m_5 + m_7 = a_{11}b_{11} + a_{12}b_{21} \equiv \mathbf{c_{11}} \quad \checkmark$$
+
+2. **Verification of $c_{21}$:**
+   $$m_2 = a_{21}b_{11} + a_{22}b_{11}$$
+   $$m_4 = a_{22}b_{21} - a_{22}b_{11}$$
+   Summing:
+   $$m_2 + m_4 = a_{21}b_{11} + (a_{22}b_{11} - a_{22}b_{11}) + a_{22}b_{21} = a_{21}b_{11} + a_{22}b_{21} \equiv \mathbf{c_{21}} \quad \checkmark$$
+
+3. **Verification of $c_{22}$:**
+   $$m_1 = a_{11}b_{11} + a_{11}b_{22} + a_{22}b_{11} + a_{22}b_{22}$$
+   $$-m_2 = -a_{21}b_{11} - a_{22}b_{11}$$
+   $$m_3 = a_{11}b_{12} - a_{11}b_{22}$$
+   $$m_6 = a_{21}b_{11} + a_{21}b_{12} - a_{11}b_{11} - a_{11}b_{12}$$
+   Summing:
+   $$(a_{11}b_{11} - a_{11}b_{11}) + (a_{11}b_{22} - a_{11}b_{22}) + (a_{22}b_{11} - a_{22}b_{11}) + (-a_{21}b_{11} + a_{21}b_{11}) + (a_{11}b_{12} - a_{11}b_{12}) + a_{21}b_{12} + a_{22}b_{22}$$
+   $$= a_{21}b_{12} + a_{22}b_{22} \equiv \mathbf{c_{22}} \quad \checkmark$$
 
 ---
 
-### Master Theorem Proof of $O(n^{\log_2 7}) \approx O(n^{2.807})$
-The recurrence relation for Strassen’s algorithm is:
-$$T(n) = 7 T(n/2) + \Theta(n^2)$$
+### Master Theorem Proof of $O(n^{\log_2 7}) \approx O(n^{2.807})$ (Slip Test 4, Puzzle 2)
 
-- $a = 7$ (subproblems)
-- $b = 2$ (dimension factor)
-- $f(n) = \Theta(n^2)$
-- Critical exponent: $\log_b a = \log_2 7 \approx \mathbf{2.80735}$.
-- Since $f(n) = O(n^2) = O(n^{\log_2 7 - \epsilon})$ where $\epsilon \approx 0.807 > 0$, **Case 1 of the Master Theorem applies**:
-  $$T(n) = \mathbf{\Theta(n^{\log_2 7}) \approx \Theta(n^{2.807})}$$
+Let $T(n)$ be the number of multiplications required to multiply two $n \times n$ matrices.  
+Dividing the matrices into four $(n/2) \times (n/2)$ submatrices requires computing the $7$ variables $m_1 \dots m_7$:
+$$T(n) = 7 T(n/2), \quad T(1) = 1$$
+
+- $a = 7$ (subproblems of size $n/2$)
+- $b = 2$ (shrink factor)
+- By the Master Theorem (or direct substitution):
+  $$T(n) = 7^{\log_2 n} = n^{\log_2 7} \approx \mathbf{n^{2.8074}}$$
+
+---
+
+### Exact Count of Total Arithmetic Operations: $7n^{\log_2 7} - 6n^2$ (Slip Test 4 Bonus)
+
+> **Bonus Question [1 Mark]:**  
+> *"What is the total number of arithmetic operations $(\times, +, -)$ performed by Strassen’s algorithm to multiply two matrices $A$ and $B$ of size $n \times n$ each? Explain."*
+
+#### 1. Multiplications Count $M(n)$:
+At base case $n = 1$, $M(1) = 1$.  
+At each level, we do 7 recursive matrix multiplications of half the dimension:
+$$M(n) = 7 M(n/2) \implies \mathbf{M(n) = n^{\log_2 7}}$$
+
+#### 2. Additions and Subtractions Count $A(n)$:
+- **Base case:** For $1 \times 1$ matrices ($n = 1$), $A(1) = 0$ (no additions needed).
+- **Recursive step:** Adding or subtracting two $(n/2) \times (n/2)$ matrices requires $(n/2)^2 = \frac{n^2}{4}$ operations.
+  - Computing the inputs for $m_1 \dots m_7$ requires **10 submatrix additions/subtractions**:
+    - $a_{11} + a_{22}$, $b_{11} + b_{22}$ (2 for $m_1$)
+    - $a_{21} + a_{22}$ (1 for $m_2$)
+    - $b_{12} - b_{22}$ (1 for $m_3$)
+    - $b_{21} - b_{11}$ (1 for $m_4$)
+    - $a_{11} + a_{12}$ (1 for $m_5$)
+    - $a_{21} - a_{11}$, $b_{11} + b_{12}$ (2 for $m_6$)
+    - $a_{12} - a_{22}$, $b_{21} + b_{22}$ (2 for $m_7$)
+  - Combining $m_1 \dots m_7$ to produce $c_{11}, c_{12}, c_{21}, c_{22}$ requires **8 submatrix additions/subtractions**:
+    - $c_{11}$: 3 operations ($m_1 + m_4 - m_5 + m_7$)
+    - $c_{12}$: 1 operation ($m_3 + m_5$)
+    - $c_{21}$: 1 operation ($m_2 + m_4$)
+    - $c_{22}$: 3 operations ($m_1 - m_2 + m_3 + m_6$)
+  - **Total submatrix additions/subtractions per step:** $10 + 8 = 18$.
+  - Since each operates on $(n/2) \times (n/2)$ elements:
+    $$\text{Additions per step} = 18 \times \left(\frac{n}{2}\right)^2 = \frac{18}{4} n^2 = \frac{9}{2} n^2$$
+
+#### 3. Solving the Addition Recurrence:
+$$A(n) = 7 A(n/2) + \frac{9}{2} n^2, \quad A(1) = 0$$
+
+Let $n = 2^k$. The recurrence becomes:
+$$A(2^k) = 7 A(2^{k-1}) + 18 \cdot 4^{k-1}$$
+Unrolling the recurrence:
+$$A(2^k) = 18 \sum_{j=0}^{k-1} 7^j \cdot 4^{k-1-j} = 18 \cdot 4^{k-1} \sum_{j=0}^{k-1} \left(\frac{7}{4}\right)^j$$
+Using the geometric series formula $\sum_{j=0}^{k-1} r^j = \frac{r^k - 1}{r - 1}$ with $r = \frac{7}{4}$:
+$$\sum_{j=0}^{k-1} \left(\frac{7}{4}\right)^j = \frac{\left(\frac{7}{4}\right)^k - 1}{\frac{7}{4} - 1} = \frac{\left(\frac{7}{4}\right)^k - 1}{\frac{3}{4}} = \frac{4}{3} \left[ \left(\frac{7}{4}\right)^k - 1 \right]$$
+Substitute back:
+$$A(2^k) = 18 \cdot 4^{k-1} \cdot \frac{4}{3} \left[ \frac{7^k}{4^k} - 1 \right] = 18 \cdot \frac{4^k}{4} \cdot \frac{4}{3} \left[ \frac{7^k - 4^k}{4^k} \right] = 6 (7^k - 4^k)$$
+Since $7^k = n^{\log_2 7}$ and $4^k = (2^k)^2 = n^2$:
+$$\mathbf{A(n) = 6 n^{\log_2 7} - 6 n^2}$$
+
+#### 4. Total Arithmetic Operations:
+$$\text{Total Ops}(n) = M(n) + A(n) = n^{\log_2 7} + \big(6 n^{\log_2 7} - 6 n^2\big) = \mathbf{7 n^{\log_2 7} - 6 n^2}$$
+
+- **Verification for $n = 2$ ($k = 1$):**
+  $$\text{Total Ops}(2) = 7(2^{\log_2 7}) - 6(2^2) = 7(7) - 6(4) = 49 - 24 = \mathbf{25}$$
+  Matches exactly: 7 multiplications $+ 18$ additions/subtractions $= 25$ operations!
 
 ---
 
@@ -128,13 +206,49 @@ $$T(n) = 7 T(n/2) + \Theta(n^2)$$
 
 ---
 
-## 4. The Theoretical Frontier of Matrix Multiplication ($\omega$)
+## 4. The Theoretical Frontier of Matrix Multiplication & AlphaTensor
+
+---
+
+### DeepMind AlphaTensor: $4 \times 4$ Binary Matrices (Slip Test 4, Puzzle 3)
+
+> **Exam Question (Slip Test 4, Puzzle 3):**  
+> *"In October 2022, Google DeepMind’s AI AlphaTensor presented an algorithm that multiplies two $4 \times 4$ binary matrices using just $47$ multiplications.*  
+> *Write and explain a recurrence for $T(n)$ in terms of $T(n/4)$ for binary matrix multiplication. Solve it. (Take $\log_4 47 \approx 2.7773$.)"*
+
+#### 1. Why is 47 Multiplications a Breakthrough?
+- Two $n \times n$ matrices can be split into **16 submatrices of size $(n/4) \times (n/4)$** each.
+- **Conventional algorithm** requires $4^3 = \mathbf{64}$ multiplications.
+- Applying Strassen's algorithm twice (since $4 = 2 \times 2$) requires $7 \times 7 = \mathbf{49}$ multiplications.
+- Google DeepMind's **AlphaTensor** formulated matrix multiplication as a 3D tensor game and used deep reinforcement learning (AlphaZero) to discover a scheme requiring only **47 multiplications** over $\mathbb{Z}_2$!
+
+#### 2. The Recurrence Relation:
+Let $T(n)$ denote the number of multiplications required to multiply two $n \times n$ binary matrices.  
+Dividing the matrices into sixteen $(n/4) \times (n/4)$ blocks:
+$$T(n) = 47 T(n/4), \quad T(1) = 1$$
+
+#### 3. Solving the Recurrence:
+- Subproblems: $a = 47$
+- Subproblem size reduction factor: $b = 4$
+- Critical exponent:
+  $$\log_b a = \log_4 47 = \frac{\ln 47}{\ln 4} \approx \frac{3.85015}{1.38629} \approx \mathbf{2.7773}$$
+- Including the $\Theta(n^2)$ matrix additions, Case 1 of the Master Theorem applies:
+  $$T(n) = \mathbf{\Theta\left(n^{\log_4 47}\right) \approx \Theta\left(n^{2.7773}\right)}$$
+
+#### Comparison of Exponents:
+$$\text{Standard: } O(n^3) \quad > \quad \text{Strassen: } O(n^{2.8074}) \quad > \quad \text{AlphaTensor: } \mathbf{O(n^{2.7773})}$$
+AlphaTensor established the fastest known practical algorithm for $4 \times 4$ matrices!
+
+---
+
+### The Timeline of Exponent $\omega$
 
 The asymptotic exponent of matrix multiplication is denoted by $\omega$:
 $$T(n) = O(n^\omega)$$
 
 - Standard: $\omega = 3.0$
 - Strassen (1969): $\omega \approx 2.807$
+- AlphaTensor (2022, $4 \times 4$ binary): $\omega \approx 2.7773$
 - Coppersmith–Winograd (1990): $\omega \approx 2.3755$
 - Duan, Wu, Zhou (2023): $\omega \approx \mathbf{2.37155}$
 - **Conjectured Lower Bound:** $\omega = 2$ (since writing down the $n^2$ output elements requires $\Omega(n^2)$ operations).

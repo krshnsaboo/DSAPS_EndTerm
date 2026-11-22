@@ -38,26 +38,40 @@ Each guide is designed for deep conceptual mastery and covers intuition, mathema
   - Complete modern C++ implementation with $O(1)$ ranking matrix, automated stability verifier, and uniqueness checker.
   - 9 advanced exam variations (Rural Hospital Theorem, Roommates problem, manipulability).
 
-- **[Knapsack Problem Mastery Guide](Knapsack_Mastery_Guide.md)**
-  - 0/1 vs Fractional vs Unbounded Knapsack.
-  - Slip Test 2 analysis: monotonic weights/values, identical ratios (Subset Sum), and exponential values ($v_{i+1} = 2v_i$).
-  - 1D DP space optimizations, dual DP for huge capacities ($W \le 10^9$), and LeetCode/Codeforces problems (LC 416, Knapsack 2, CF 864E Fire with deadlines, LC 474 2D Knapsack).
+- **[Interval Scheduling & Classroom Partitioning Mastery Guide](Interval_Scheduling_Mastery_Guide.md)**
+  - Comprehensive guide based on the 72-page `Interval Scheduling.pdf` and Midsem Classroom Scheduling.
+  - The 6 greedy heuristics evaluated for feasibility and optimality: Alg 1 (Earliest Start), Alg 2 (Shortest Duration), Alg 3 (Delete Largest), Alg 4 (Delete Dominating - not even feasible!), Alg 5 (Delete Dominating + Earliest Start - optimal!), and Alg 6 (Earliest End Time).
+  - Formal **"Greedy Stays Ahead"** induction proof.
+  - Interval Partitioning: Depth theorem ($\text{Classrooms} \ge \text{Depth}$), min-heap $O(n \log n)$ room allocation, and exact solution to the 8-class homework ($d = 3$ classrooms).
+  - Weighted Interval Scheduling with $O(n \log n)$ binary-search DP, and practice problems (LeetCode 435, 253, 1235).
 
 - **[Coin Change Problem Mastery Guide](Coin_Change_Mastery_Guide.md)**
   - Canonical coin systems and counterexamples to greedy ($\{1, 3, 4\}$ for 6).
-  - Proof of pseudo-polynomial time complexity ($O(n \cdot A)$).
+  - Proof of pseudo-polynomial time complexity ($O(n \cdot A) = O(n \cdot 2^L)$).
+  - **Slip Test 1 (10 Aug 2026) Deep Dive:** Bounded denomination $13$ (at most 2) with unlimited $\{1, 6, 8\}$ for amounts $45$ (5 coins), $59$ (7 coins), and $1000$ (124 coins), plus general $O(n A + k)$ algorithm.
   - The Combinations vs Permutations loop-order invariant (LeetCode 518 vs LeetCode 377, CF 189A Cut Ribbon, LC 1449).
 
 - **[Longest Common Subsequence (LCS) Mastery Guide](LCS_Mastery_Guide.md)**
   - Prefix property proofs, 2D DP, space optimization to $O(\min(m, n))$, and **Hirschberg's Algorithm** ($O(m + n)$ space reconstruction).
+  - Step-by-step lecture walkthrough for $X = \text{"bafdecafdc"}$ vs $Y = \text{"abcdef"}$ from `Longest common subsequence.pdf`.
+  - **Slip Test 2 (17 Aug 2026) Deep Dive:** Levenshtein edit distance evaluations with exact alignment & transformation notation (`dist("sleeveless", "lessens") = 6`, `dist("intelligent", "belligerent") = 5`, `dist("melanin", "millennial") = 6`), and the complete $O(n_1 \cdot n_2)$ DP algorithm.
   - Reductions to Shortest Common Supersequence (SCS), Edit Distance, Palindromic Subsequences (LPS), and LeetCode/Codeforces problems (LC 1092, LC 115, CF 1446B).
 
+- **[Knapsack Problem Mastery Guide](Knapsack_Mastery_Guide.md)**
+  - 0/1 vs Fractional vs Unbounded Knapsack.
+  - Slip Test 2 analysis: monotonic weights/values, identical ratios (Subset Sum), and exponential values ($v_{i+1} = 2v_i$).
+  - **Slip Test 3 (31 Aug 2026) Deep Dive:** The Two Thieves Knapsack Problem ($W_1 = 15, W_2 = 17$, 7 items: optimal stolen value $105$ leaving only Item 3), and general Two-Knapsack 3D/2D space-optimized DP ($O(n W_1 W_2)$ time, $O(W_1 W_2)$ space).
+  - Dual DP for huge capacities ($W \le 10^9$), and LeetCode/Codeforces problems (LC 416, Knapsack 2, CF 864E Fire with deadlines, LC 474 2D Knapsack).
+
 - **[Integer Multiplication Mastery Guide](Integer_Multiplication_Mastery_Guide.md)**
+  - Baseline addition complexity $O(\max(\log_2 a, \log_2 b))$ vs repeated addition ($O(b \log a)$ exponential in bits).
   - From Schoolbook $\Theta(n^2)$ to Karatsuba's $O(n^{\log_2 3}) \approx O(n^{1.585})$ via Gauss's algebraic trick.
+  - Instructor's visual architecture from `Multiplication.pdf` (horizontal additions/shifts vs vertical recursive multiplications).
   - Master Theorem proofs, Toom-Cook, Schönhage–Strassen FFT, and Harvey–Hoeven $O(n \log n)$.
 
 - **[Matrix Multiplication Mastery Guide](Matrix_Multiplication_Mastery_Guide.md)**
   - Strassen's Algorithm: reducing 8 submultiplications to 7 $\implies O(n^{2.807})$.
+  - **Slip Test 4 (3 Sept 2026) Deep Dive:** Exact algebraic derivations of $c_{11}, c_{21}, c_{22}$ from $m_1 \dots m_7$, exact total arithmetic operations count ($7n^{\log_2 7} - 6n^2$), and DeepMind AlphaTensor ($T(n) = 47 T(n/4) \implies O(n^{2.7773})$).
   - Matrix Chain Multiplication (MCM): why parenthesization matters, Catalan number explosion, and $O(n^3)$ dynamic programming.
 
 ---
