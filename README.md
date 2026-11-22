@@ -9,19 +9,27 @@ This repository contains full, mathematically rigorous, and step-by-step solutio
 ## 📚 Repository Contents
 
 ### 1. ⚡ [Ultimate Last-Day Revision Notes](DSAPS_Last_Day_Revision_Notes.md) *(Exam-Eve Master Cheat Sheet)*
-A high-density distillation of every topic, theorem, recurrence, and Slip Test solution:
-- **Master Complexity Table:** Quick-reference cheat sheet for all algorithms, recurrences, and space bounds.
-- **Twin Pillars of MST & Monotonicity Rules:** Cut vs Cycle property, strictly increasing vs decreasing function effects on MST vs SPT.
-- **Johnson's Algorithm Invariants:** Telescoping cancellation over paths, dummy source $s$ necessity, and negative cycle proofs.
-- **Gale-Shapley Stable Marriage:** Proposer-optimality, receiver-pessimality, order invariance, and $n^2 - n + 1$ proposal bound.
-- **Interval Scheduling & Partitioning:** The 6 heuristics (feasibility & optimality), Greedy Stays Ahead proof, and Classroom Depth theorem.
-- **Dynamic Programming Deep Dives:** Coin change pseudo-polynomial proof & loop order invariant, LCS & Levenshtein distance, 0/1 knapsack reverse loops, and Two Thieves knapsack.
-- **Integer & Matrix Multiplication:** Karatsuba $O(n^{1.585})$, Strassen $7n^{\log_2 7} - 6n^2$ exact operations, DeepMind AlphaTensor $O(n^{2.7773})$, and Matrix Chain Multiplication.
-- **Top 20 Exam Traps Bank:** Quickfire Q&A covering the exact conceptual traps professors set in exams.
+A high-density distillation of every topic, theorem, recurrence, and Slip Test solution.
 
 ---
 
-### 2. 📝 [End-Semester 2025 Examination Solutions](DSAPS_EndSem_Solutions.md)
+### 2. 🎯 [Master Question Bank & Exam Variations Guide](DSAPS_Master_Question_Bank_and_Variations.md) *(Comprehensive Problem Bank)*
+An exhaustive compilation of every single PYQ, Slip Test, class puzzle, and theoretical variation discussed across the course, organized by topic with detailed mathematical solutions and proofs:
+- **Topic 1: Johnson's Algorithm & Shortest Path Variations:** EndSem 2025 Puzzle 1 (adding edges from existing node $A$), constant shift failure, Dijkstra on longest paths.
+- **Topic 2: Minimum Spanning Trees (MST):** EndSem 2025 Puzzle 2 (`MAYBE-MST-A` Reverse-Delete, `MAYBE-MST-C` Cycle-Breaking), 8 monotonic function transformations ($f(x) = \sqrt{x}, x^3, x+c, -x, 1/x, \dots$), MBST vs MST.
+- **Topic 3: Gale-Shapley Stable Marriage:** EndSem 2025 Puzzle 6, proposal bounds ($n^2 - n + 1$), $O(n^2)$ uniqueness testing, receiver strategic manipulation.
+- **Topic 4: Interval Scheduling & Partitioning:** The 6 heuristics (feasibility & optimality), Slide 71-72 Homework (8 classes $\implies$ 3 classrooms), Greedy Stays Ahead proof.
+- **Topic 5: Dynamic Programming — Coin Change:** Slip Test 1 (10 Aug 2026) bounded 13s ($A = 45, 59, 1000$) and general $O(n A + k)$ algorithm; Slip Test 25 Aug 2025 Puzzle 4 (pseudo-polynomial proof); combinations vs permutations loop orders.
+- **Topic 6: Dynamic Programming — LCS & Edit Distance:** Slip Test 2 (17 Aug 2026) Levenshtein distance (`sleeveless` vs `lessens`, `intelligent` vs `belligerent`, `melanin` vs `millennial`); Lecture Slide 31 Table Trace (`bafdecafdc` vs `abcdef`).
+- **Topic 7: Dynamic Programming — Knapsack & Multiple Knapsacks:** Slip Test 3 (31 Aug 2026) Two Thieves Knapsack ($W_1 = 15, W_2 = 17$, 7 items: optimal stolen value 105); Slip Test 25 Aug 2025 Puzzles 1–3 (monotonic knapsack, equal ratios, exponential values).
+- **Topic 8: Divide-and-Conquer — Integer Multiplication:** Handwritten notes from `Multiplication.pdf`, Karatsuba recurrence derivation, change of base $\log_2 3$, and timeline to Harvey-Hoeven.
+- **Topic 9: Divide-and-Conquer — Matrix Multiplication & MCM:** Slip Test 4 (3 Sept 2026) Strassen terms ($c_{11}, c_{21}, c_{22}$), exact arithmetic ops ($7n^{\log_2 7} - 6n^2$), DeepMind AlphaTensor ($n^{2.7773}$), MCM chain DP.
+- **Topic 10: Recurrences & Matrix Exponentiation:** Slip Test 4 Aug 2025 Amoeba population growth (Tribonacci sequence $F(t) = F(t-1) + F(t-2) + F(t-3)$) and $O(\log t)$ matrix exponentiation.
+- **Topic 11: Disjoint Set Union (DSU) & Grid BFS:** EndSem 2025 Puzzle 5 (DSU path compression + rank) and Puzzle 7 (Grid BFS pathfinding).
+
+---
+
+### 3. 📝 [End-Semester 2025 Examination Solutions](DSAPS_EndSem_Solutions.md)
 Complete, verified solutions and proofs for all 7 puzzles (70 Marks Total):
 - **Puzzle 1:** Johnson's Algorithm Modifications (Case 1 & Case 2 analysis, artificial negative cycles).
 - **Puzzle 2:** Minimum Spanning Tree Algorithms (`MAYBE-MST-A` Reverse-Delete & `MAYBE-MST-C` Cycle-Breaking).
@@ -33,7 +41,7 @@ Complete, verified solutions and proofs for all 7 puzzles (70 Marks Total):
 
 ---
 
-### 3. 🚀 Topic-Wise Algorithmic Mastery Guides
+### 4. 🚀 Topic-Wise Algorithmic Mastery Guides
 
 Each guide is designed for deep conceptual mastery and covers intuition, mathematical proofs, edge cases, C++ code, and curated LeetCode/Codeforces problems:
 
