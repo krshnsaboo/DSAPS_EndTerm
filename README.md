@@ -8,7 +8,20 @@ This repository contains full, mathematically rigorous, and step-by-step solutio
 
 ## 📚 Repository Contents
 
-### 1. 📝 [End-Semester 2025 Examination Solutions](DSAPS_EndSem_Solutions.md)
+### 1. ⚡ [Ultimate Last-Day Revision Notes](DSAPS_Last_Day_Revision_Notes.md) *(Exam-Eve Master Cheat Sheet)*
+A high-density distillation of every topic, theorem, recurrence, and Slip Test solution:
+- **Master Complexity Table:** Quick-reference cheat sheet for all algorithms, recurrences, and space bounds.
+- **Twin Pillars of MST & Monotonicity Rules:** Cut vs Cycle property, strictly increasing vs decreasing function effects on MST vs SPT.
+- **Johnson's Algorithm Invariants:** Telescoping cancellation over paths, dummy source $s$ necessity, and negative cycle proofs.
+- **Gale-Shapley Stable Marriage:** Proposer-optimality, receiver-pessimality, order invariance, and $n^2 - n + 1$ proposal bound.
+- **Interval Scheduling & Partitioning:** The 6 heuristics (feasibility & optimality), Greedy Stays Ahead proof, and Classroom Depth theorem.
+- **Dynamic Programming Deep Dives:** Coin change pseudo-polynomial proof & loop order invariant, LCS & Levenshtein distance, 0/1 knapsack reverse loops, and Two Thieves knapsack.
+- **Integer & Matrix Multiplication:** Karatsuba $O(n^{1.585})$, Strassen $7n^{\log_2 7} - 6n^2$ exact operations, DeepMind AlphaTensor $O(n^{2.7773})$, and Matrix Chain Multiplication.
+- **Top 20 Exam Traps Bank:** Quickfire Q&A covering the exact conceptual traps professors set in exams.
+
+---
+
+### 2. 📝 [End-Semester 2025 Examination Solutions](DSAPS_EndSem_Solutions.md)
 Complete, verified solutions and proofs for all 7 puzzles (70 Marks Total):
 - **Puzzle 1:** Johnson's Algorithm Modifications (Case 1 & Case 2 analysis, artificial negative cycles).
 - **Puzzle 2:** Minimum Spanning Tree Algorithms (`MAYBE-MST-A` Reverse-Delete & `MAYBE-MST-C` Cycle-Breaking).
@@ -20,7 +33,7 @@ Complete, verified solutions and proofs for all 7 puzzles (70 Marks Total):
 
 ---
 
-### 2. 🚀 Topic-Wise Algorithmic Mastery Guides
+### 3. 🚀 Topic-Wise Algorithmic Mastery Guides
 
 Each guide is designed for deep conceptual mastery and covers intuition, mathematical proofs, edge cases, C++ code, and curated LeetCode/Codeforces problems:
 
