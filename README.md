@@ -8,12 +8,21 @@ This repository contains full, mathematically rigorous, and step-by-step solutio
 
 ## 📚 Repository Contents
 
-### 1. ⚡ [Ultimate Last-Day Revision Notes](DSAPS_Last_Day_Revision_Notes.md) *(Exam-Eve Master Cheat Sheet)*
+### 1. 🛡️ [Master Proofs & Counterexamples Compendium](DSAPS_Last_Minute_Proofs_and_Counterexamples.md) *(Essential Exam Weapon)*
+The definitive last-minute revision document focused exclusively on the two highest-weight exam requirements:
+- **15 Verbatim Proofs of Optimality:** Exact, complete proofs for Cut Property, Cycle Property, Monotonic MST Invariance, Greedy Stays Ahead Induction, Interval Partitioning Depth Theorem, Gale-Shapley Proposer-Optimality, Johnson's Telescoping Potentials, 0/1 Knapsack Cut-and-Paste, Fractional Knapsack Exchange, Monotonic Knapsack, Exponential Knapsack, Pseudo-Polynomial Complexity, LPS $\equiv$ LCS, and Strassen $7n^{\log_2 7} - 6n^2$.
+- **15 Classic Counterexamples with Exact Graphs & Numbers:** Detailed failure traces for constant weight shifts ($w(e)+C$), squared weights ($w(e)^2$), adding 0-weight edges from existing nodes in Johnson's, non-monotonic functions ($(x-5)^2$), MBST $\ne$ MST, `MAYBE-MST-X` failure, interval scheduling heuristics (Algs 1, 2, 4, minimum conflicts), weighted interval greedy failure, non-canonical coin systems ($\{1, 3, 4\}, \{1, 5, 7\}, \{1, 6, 10\}$), 0/1 knapsack ratio failures, and Strassen operation overhead for $n \le 32$.
+- **The "Does It Change?" Invariant Matrix:** Quick-lookup table showing exact effects of 9 transformations on MST vs SPT.
+- **The 10 Fatal Exam Assumptions:** Common pitfalls where students lose marks.
+
+---
+
+### 2. ⚡ [Ultimate Last-Day Revision Notes](DSAPS_Last_Day_Revision_Notes.md) *(Exam-Eve Master Cheat Sheet)*
 A high-density distillation of every topic, theorem, recurrence, and Slip Test solution.
 
 ---
 
-### 2. 🎯 [Master Question Bank & Exam Variations Guide](DSAPS_Master_Question_Bank_and_Variations.md) *(Comprehensive Problem Bank)*
+### 3. 🎯 [Master Question Bank & Exam Variations Guide](DSAPS_Master_Question_Bank_and_Variations.md) *(Comprehensive Problem Bank)*
 An exhaustive compilation of every single PYQ, Slip Test, class puzzle, and theoretical variation discussed across the course, organized by topic with detailed mathematical solutions and proofs:
 - **Topic 1: Johnson's Algorithm & Shortest Path Variations:** EndSem 2025 Puzzle 1 (adding edges from existing node $A$), constant shift failure, Dijkstra on longest paths.
 - **Topic 2: Minimum Spanning Trees (MST):** EndSem 2025 Puzzle 2 (`MAYBE-MST-A` Reverse-Delete, `MAYBE-MST-C` Cycle-Breaking), 8 monotonic function transformations ($f(x) = \sqrt{x}, x^3, x+c, -x, 1/x, \dots$), MBST vs MST.
@@ -29,7 +38,7 @@ An exhaustive compilation of every single PYQ, Slip Test, class puzzle, and theo
 
 ---
 
-### 3. 🧪 [Fresh Exam Practice Questions & Model Solutions](DSAPS_Exam_Practice_Questions_and_Solutions.md) *(50-Question Master Challenge)*
+### 4. 🧪 [Fresh Exam Practice Questions & Model Solutions](DSAPS_Exam_Practice_Questions_and_Solutions.md) *(50-Question Master Challenge)*
 A brand-new, comprehensive mock challenge featuring **exactly 5 master-level questions per topic (50 questions total)**, designed to test deep conceptual understanding and boundary cases, with complete examiner-style model solutions:
 - **Topic 1 (Johnson & Shortest Paths):** Arbitrary constant shift in potential $h(v) + C$, negative-weight dummy edges, zero-weight cycles, quadratic weight transforms, and single negative edge in $O((V+E)\log V)$.
 - **Topic 2 (MST & Graph Properties):** Second-best MST single-edge swap proof & $O(E \log V)$ algorithm, `MAYBE-MST-X` failure proof, non-monotonic transformations $(x-5)^2$, $O(V)$ edge decrease update, and MSF size formula $V - k$.
@@ -44,7 +53,7 @@ A brand-new, comprehensive mock challenge featuring **exactly 5 master-level que
 
 ---
 
-### 4. 📝 [End-Semester 2025 Examination Solutions](DSAPS_EndSem_Solutions.md)
+### 5. 📝 [End-Semester 2025 Examination Solutions](DSAPS_EndSem_Solutions.md)
 Complete, verified solutions and proofs for all 7 puzzles (70 Marks Total):
 - **Puzzle 1:** Johnson's Algorithm Modifications (Case 1 & Case 2 analysis, artificial negative cycles).
 - **Puzzle 2:** Minimum Spanning Tree Algorithms (`MAYBE-MST-A` Reverse-Delete & `MAYBE-MST-C` Cycle-Breaking).
@@ -56,7 +65,7 @@ Complete, verified solutions and proofs for all 7 puzzles (70 Marks Total):
 
 ---
 
-### 5. 🚀 Topic-Wise Algorithmic Mastery Guides
+### 6. 🚀 Topic-Wise Algorithmic Mastery Guides
 
 Each guide is designed for deep conceptual mastery and covers intuition, mathematical proofs, edge cases, C++ code, and curated LeetCode/Codeforces problems:
 
