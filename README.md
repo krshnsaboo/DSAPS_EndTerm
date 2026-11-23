@@ -29,7 +29,22 @@ An exhaustive compilation of every single PYQ, Slip Test, class puzzle, and theo
 
 ---
 
-### 3. 📝 [End-Semester 2025 Examination Solutions](DSAPS_EndSem_Solutions.md)
+### 3. 🧪 [Fresh Exam Practice Questions & Model Solutions](DSAPS_Exam_Practice_Questions_and_Solutions.md) *(50-Question Master Challenge)*
+A brand-new, comprehensive mock challenge featuring **exactly 5 master-level questions per topic (50 questions total)**, designed to test deep conceptual understanding and boundary cases, with complete examiner-style model solutions:
+- **Topic 1 (Johnson & Shortest Paths):** Arbitrary constant shift in potential $h(v) + C$, negative-weight dummy edges, zero-weight cycles, quadratic weight transforms, and single negative edge in $O((V+E)\log V)$.
+- **Topic 2 (MST & Graph Properties):** Second-best MST single-edge swap proof & $O(E \log V)$ algorithm, `MAYBE-MST-X` failure proof, non-monotonic transformations $(x-5)^2$, $O(V)$ edge decrease update, and MSF size formula $V - k$.
+- **Topic 3 (Gale-Shapley Matching):** Complete 5-proposal execution trace, non-GS matching stability audit & blocking pairs, Rural Hospital Theorem, weak stability with ties, and $O(n^2)$ stability auditor.
+- **Topic 4 (Interval Scheduling & Partitioning):** Minimum Conflicts heuristic counterexample, endpoint-touching interval depth calculation ($d = 4$), machine setup time $\Delta$ reduction, weighted DP with traceback, and pigeonhole lower bound proof.
+- **Topic 5 (Coin Change):** Smallest counterexample for non-canonical system $\{1, 5, 7\}$, exact-count bounded coin change trace, $O(A)$ modulo counting C++ implementation, unary encoding complexity proof, and lexicographical largest reconstruction.
+- **Topic 6 (LCS & Edit Distance):** Full Levenshtein diagram and transition script (`kitten` $\to$ `sitting`), Hirschberg's D&C split recurrence, formal proof of $\text{LPS}(S) = \text{LCS}(S, S^R)$, SCS length formula proof, and $O(n \log n)$ distinct-character LCS.
+- **Topic 7 (Knapsack & Multiple Knapsacks):** Counterexample proving greedy fails for equal ratio $v_i/w_i = r$, Two Knapsacks with capacities $8$ and $10$ assignment, Dual DP for $W = 10^9$ with runtime proof, forward loop unbounded degeneration explanation, and fractional knapsack exchange proof.
+- **Topic 8 (Integer Multiplication):** Step-by-step Karatsuba trace for $2345 \times 6789 = 15,920,205$, Master Theorem for 3-split 6-multiplication recurrence ($O(n^{1.631})$), Toom-3 recurrence and practical overhead, bit-complexity of addition vs multiplication, and Harvey-Hoeven theoretical horizon.
+- **Topic 9 (Matrix Multiplication & MCM):** Strassen $c_{21} = m_2 + m_4$ algebraic proof, exact operation count for $4 \times 4$ (247 operations), AlphaTensor real field extension, 4-matrix MCM full DP table with optimal parentheses, and Catalan recurrence proof.
+- **Topic 10 (Recurrences & DSU):** Quadranacci 4-hour amoeba recurrence and $4 \times 4$ companion matrix, DSU single-optimization vs dual-optimization bounds ($\Theta(m \log n)$ vs $\Theta(m \alpha(n))$), bipartite detection with DSU, Extended Master Theorem Case 2b ($T(n) = 2T(n/2) + n \log n \implies \Theta(n \log^2 n)$), and state-space augmented grid BFS with fuel battery.
+
+---
+
+### 4. 📝 [End-Semester 2025 Examination Solutions](DSAPS_EndSem_Solutions.md)
 Complete, verified solutions and proofs for all 7 puzzles (70 Marks Total):
 - **Puzzle 1:** Johnson's Algorithm Modifications (Case 1 & Case 2 analysis, artificial negative cycles).
 - **Puzzle 2:** Minimum Spanning Tree Algorithms (`MAYBE-MST-A` Reverse-Delete & `MAYBE-MST-C` Cycle-Breaking).
@@ -41,7 +56,7 @@ Complete, verified solutions and proofs for all 7 puzzles (70 Marks Total):
 
 ---
 
-### 4. 🚀 Topic-Wise Algorithmic Mastery Guides
+### 5. 🚀 Topic-Wise Algorithmic Mastery Guides
 
 Each guide is designed for deep conceptual mastery and covers intuition, mathematical proofs, edge cases, C++ code, and curated LeetCode/Codeforces problems:
 
